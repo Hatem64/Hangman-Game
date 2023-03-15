@@ -9,44 +9,26 @@ public class Server {
 
 
     public static void main(String[] args) throws IOException {
-    Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter Username: ");
-    String username = scanner.nextLine();
-    System.out.print("Enter Password: ");
-    String password = scanner.nextLine();
-    System.out.println("");
+        String username = "";
+        String password = "";
+        try {
+            ServerSocket serverSocket = new ServerSocket(6666);
+            Socket socket = serverSocket.accept();
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+            while (true){
+                dataOutputStream.writeUTF("Enter Username: ");
+                username = (String) dataInputStream.readUTF();
+                dataOutputStream.writeUTF("Enter Password: ");
+                password = (String) dataInputStream.readUTF();
+//                boolean state =  object.login(username, password);
 
-    boolean state =  login(username, password);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
 
     }
 
-    public static boolean login(String username, String password){
-        File file = new File("D:\\Ahmed\\College_Shit\\4th_Year\\Term 2\\SE for Distributed Systems\\Assignments\\Assignment 1\\Hangman-Game\\Users.txt");
-        Scanner reader;
 
-        {
-            try {
-                reader = new Scanner(file);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        while(reader.hasNextLine()){
-            String line = reader.nextLine();
-            String[] user = line.split(",");
-            if(!user[1].equals(username)){
-                System.out.println("404 username not found!");
-                return false;
-            }
-            if(!user[2].equals(password)){
-                System.out.println("401 unauthorized access!");
-                return false;
-            }
-            System.out.println("Welcome " + user[3]);
-            return true;
-        }
-        System.out.println("No user exists");
-        return false;
-    }
 }
