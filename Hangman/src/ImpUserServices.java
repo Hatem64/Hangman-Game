@@ -1,10 +1,17 @@
 import java.io.*;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class ImpUserServices implements UserServices{
     private String name;
     private String userName;
     private String password;
+    private Socket clientSocket;
+    private BufferedReader in;
+    private PrintWriter out;
+
+    private String word;
+    private String guess;
 
     public ImpUserServices() {}
 
@@ -30,6 +37,18 @@ public class ImpUserServices implements UserServices{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+
+    public ImpUserServices(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+        try {
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -69,7 +88,7 @@ public class ImpUserServices implements UserServices{
     }
 
     @Override
-    public boolean login(String userName, String password) {
+    public boolean login(String userName, String password)               {
             File file = new File("RegisteredUsers.txt");
             Scanner reader;
             {
