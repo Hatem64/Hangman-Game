@@ -1,22 +1,27 @@
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 
 public class Server {
-
-
-
-    public static void main(String[] args) throws IOException {
         String username = "";
         String password = "";
-        try {
-            ServerSocket serverSocket = new ServerSocket(6666);
+        private int port;
+    public Server(int port) throws IOException {
+        this.port = port;
+    }
+    public void run()
+    {
+        try (ServerSocket serverSocket = new ServerSocket(port)){
             Socket socket = serverSocket.accept();
+            ImpUserServices impUserServices= new ImpUserServices(socket);
+            //bahbdd t2rebnn msh 3aref bas hass en ehna l mfrod nekhlyy ImpUserServices y implement Runnable :)
+            new Thread((Runnable) impUserServices).start();
+
+
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+
+            //While loop d l mfrod t2rebn mkanha mykonsh hena bas fen ma3rafsh xD
+
             while (true){
                 dataOutputStream.writeUTF("Enter Username: ");
                 username = (String) dataInputStream.readUTF();
@@ -25,11 +30,9 @@ public class Server {
 //                boolean state =  object.login(username, password);
 
             }
-        }catch (Exception e){
-            System.out.println(e);
+
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-
     }
-
-
 }
