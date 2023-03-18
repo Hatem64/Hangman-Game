@@ -41,15 +41,15 @@ public class ImpUserServices implements UserServices{
 
 
 
-    public ImpUserServices(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-        try {
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public ImpUserServices(Socket clientSocket) {
+//        this.clientSocket = clientSocket;
+//        try {
+//            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//            out = new PrintWriter(clientSocket.getOutputStream(), true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public void register(String name,String userName,String password) throws IOException {
@@ -88,8 +88,11 @@ public class ImpUserServices implements UserServices{
     }
 
     @Override
-    public boolean login(String userName, String password)               {
-            File file = new File("RegisteredUsers.txt");
+    public String login(String userName, String password){
+        boolean x=true;
+        boolean y=true;
+        String[] user = null;
+        File file = new File("RegisteredUsers.txt");
             Scanner reader;
             {
                 try {
@@ -101,19 +104,29 @@ public class ImpUserServices implements UserServices{
 
             while(reader.hasNextLine()){
                 String line = reader.nextLine();
-                String[] user = line.split(",");
+                user = line.split(",");
                 if(!user[1].equals(userName)){
-                    System.out.println("404 username not found!");
-                    return false;
+                    x = false;
+                }else{
+                    if(!user[2].equals(password)){
+                        y = false;
+                    }
+                    else {
+                        x = true;
+                        y = true;
+                        break;
+                    }
                 }
-                if(!user[2].equals(password)){
-                    System.out.println("401 unauthorized access!");
-                    return false;
-                }
-                System.out.println("Welcome " + user[0]);
-                return true;
             }
-            System.out.println("No user exists");
-            return false;
+            if(x == false){
+                return "404 username not found!";
+            }else{
+                if(y == false){
+                    return "401 unauthorized access!";
+                }else {
+                    String str = "Welcome " + user[0];
+                    return str;
+                }
+            }
     }
 }
