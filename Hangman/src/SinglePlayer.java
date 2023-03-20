@@ -70,10 +70,11 @@ public class SinglePlayer {
                 selected = dataInputStream.readUTF();
                 switch (selected){
                     case "1":
-                        easyGame();
+                        game(3, "EasyGame.txt");
                         break;
                     case "2":
-                        hardGame();
+                        //yet to add hard words.
+                        game(5, "HardGame.txt");
                         break;
                     case "3":
                         clientHandler.registrationAndLoginMenu();
@@ -85,11 +86,11 @@ public class SinglePlayer {
         }
     }
 
-    public void easyGame() throws IOException {
-        numOfAttempts = 3;
+    public void game(int numOfAttempts, String fileName) throws IOException {
+        this.numOfAttempts = numOfAttempts;
         int iteration = 0;
         int rand = (int)(Math.random() * range) + min;
-        BufferedReader bf = new BufferedReader(new FileReader("EasyGame.txt"));
+        BufferedReader bf = new BufferedReader(new FileReader(fileName));
         Scanner reader;
         //array contains the number of letters in the word
         String[] word = null;
@@ -154,11 +155,6 @@ public class SinglePlayer {
         }
     }
 
-    public void hardGame(){
-        int rand = (int)(Math.random() * range) + min;
-
-
-    }
 
     public void addScoreToUser(String Score){
         //rewrite the line, and add ",0" in the end of the user line.
