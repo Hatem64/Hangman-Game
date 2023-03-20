@@ -14,6 +14,7 @@ public class Client{
         String serverMsg = "";
         DataInputStream reader;
         DataInputStream input = null;
+        String[] returnedMsg = null;
 
         try {
             socket = new Socket(address, port);
@@ -22,9 +23,12 @@ public class Client{
 
             while(!clientMsg.equals("-")){
                 serverMsg = (String) reader.readUTF();
+                returnedMsg = serverMsg.split(",");
                 if(!serverMsg.equals(""))
                 {
-                    System.out.println("Server: " + serverMsg);
+                    System.out.println("Server: " + returnedMsg[1]);
+                } if (returnedMsg[0].equals("2") || returnedMsg[0].equals("3")) {
+                    continue;
                 }
                 System.out.print("Client: ");
                 clientMsg = scanner.nextLine();

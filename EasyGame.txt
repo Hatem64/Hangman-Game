@@ -1,0 +1,12 @@
+3,cat
+4,frog
+7,picture
+5,eagle
+4,desk
+5,river
+7,chicken
+5,pilot
+5,bread
+6,violin
+3,vet
+4,pool

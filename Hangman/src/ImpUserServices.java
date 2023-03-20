@@ -52,7 +52,7 @@ public class ImpUserServices implements UserServices{
 //    }
 
     @Override
-    public void register(String name,String userName,String password) throws IOException {
+    public String register(String name,String userName,String password) throws IOException {
         boolean x=true;
         try( BufferedWriter bw = new BufferedWriter(new FileWriter("RegisteredUsers.txt", true));)
         {
@@ -66,25 +66,22 @@ public class ImpUserServices implements UserServices{
             if(!reader.hasNextLine()){
                 bw.write(name + "," + userName + "," + password);
                 bw.newLine();
-                System.out.println("User registered successfully!");
+                return "3,User registered successfully!";
             }
             else {
                 while (reader.hasNext()) {
                     String line = reader.nextLine();
                     String[] user = line.split(",");
                     if (user[1].equals(userName)) {
-                        System.out.println("This User Name is being in use");
-                        x=false;
+                        return "3,This User Name is being in use";
                     }
                 }
-                if(x==true){
-                    bw.write(name + "," + userName + "," + password);
-                    bw.newLine();
-                    System.out.println("User registered successfully!");
-                }
+                bw.write(name + "," + userName + "," + password);
+                bw.newLine();
+                return "3,User registered successfully!";
+
             }
         }
-
     }
 
     @Override
@@ -110,6 +107,7 @@ public class ImpUserServices implements UserServices{
                 }else{
                     if(!user[2].equals(password)){
                         y = false;
+                        break;
                     }
                     else {
                         x = true;
@@ -119,12 +117,12 @@ public class ImpUserServices implements UserServices{
                 }
             }
             if(x == false){
-                return "404 username not found!";
+                return "3,404 username not found!";
             }else{
                 if(y == false){
-                    return "401 unauthorized access!";
+                    return "3,401 unauthorized access!";
                 }else {
-                    String str = "Welcome " + user[0];
+                    String str = "2,Welcome " + user[0];
                     return str;
                 }
             }
