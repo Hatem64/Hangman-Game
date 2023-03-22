@@ -14,6 +14,7 @@ public class Server {
                 System.out.println("New client connected " + client.getInetAddress().getHostAddress());
                 ClientHandler clientHandler = new ClientHandler(client);
                 new Thread(clientHandler).start();
+                //list ->
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);

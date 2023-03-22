@@ -5,79 +5,72 @@ import java.util.Scanner;
 
 public class SinglePlayer {
 
-//    private String oldScore = "";
-//    private String newScore = "";
-
-    int score = 0;
 
     //user line in the text note.
     private String user = null;
+    String[] userArr;
 
     //user line in the text note, but already split into the array.
-    private ArrayList<String>  userArr = null;
+    private String userString = null;
     String clientMsg = "";
     String serverMsg = "";
     DataOutputStream dataOutputStream;
     DataInputStream dataInputStream;
     String selected = "";
     ClientHandler clientHandler;
-    int max = 12;
+    int max = 20;
     int min = 1;
     int range = max - min + 1;
     int numOfAttempts = 0;
     Socket client = null;
+    int score = 0;
 
-
-    public SinglePlayer(String user, Socket client) throws IOException {
-        this.user = user;
-        this.client = client;
-        clientHandler = new ClientHandler(client);
-        dataOutputStream = new DataOutputStream(client.getOutputStream());
-        dataInputStream = new DataInputStream(client.getInputStream());
+    public SinglePlayer(String userString, Socket client) throws IOException {
+        this.userString = userString;
+        try {
+            BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
+            Scanner reader;
+            try {
+                reader = new Scanner(bf);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            while (reader.hasNext()) {
+                String line = reader.nextLine();
+                if (line.contains(userString)) {
+                    user = line;
+                    userArr = user.split(",");
+                    break;
+                }
+            }
+            this.client = client;
+            clientHandler = new ClientHandler(client);
+            dataOutputStream = new DataOutputStream(client.getOutputStream());
+            dataInputStream = new DataInputStream(client.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    public SinglePlayer(ArrayList<String> userArr, Socket client) throws IOException {
-        this.userArr = userArr;
-        this.client = client;
-        clientHandler = new ClientHandler(client);
-        dataOutputStream = new DataOutputStream(client.getOutputStream());
-        dataInputStream = new DataInputStream(client.getInputStream());
-    }
-
-//    public String getOldScore() {
-//        return oldScore;
-//    }
-//
-//    public void setOldScore(String oldScore) {
-//        this.oldScore = oldScore;
-//    }
-//
-//    public String getNewScore() {
-//        return newScore;
-//    }
-//
-//    public void setNewScore(String newScore) {
-//        this.newScore = newScore;
-//    }
 
     public void selectGameDifficulty(){
         try {
             while (true){
                 String[] returnedMsg = null;
-                serverMsg = "1,Please select a game difficulty " + userArr.get(0) + "\n 1-Easy \n 2-Hard \n 3-Show Score History \n 3-Exit";
+                serverMsg = "1,Please select a game difficulty " + userArr[0] + "\n 1-Easy \n 2-Hard \n 3-Show Score History \n 4-Exit";
                 dataOutputStream.writeUTF(serverMsg);
                 dataOutputStream.flush();
                 selected = dataInputStream.readUTF();
                 switch (selected){
                     case "1":
-                        game(3, "EasyGame.txt");
+                        game(4, "EasyGame.txt");
                         break;
                     case "2":
                         //yet to add hard words.
-                        game(5, "HardGame.txt");
+                        game(6, "HardGame.txt");
                         break;
                     case "3":
-                        clientHandler.registrationAndLoginMenu();
+                        clientHandler.gameMenu();
+
                 }
 
             }
@@ -85,15 +78,15 @@ public class SinglePlayer {
             throw new RuntimeException(e);
         }
     }
-
     public void game(int numOfAttempts, String fileName) throws IOException {
         this.numOfAttempts = numOfAttempts;
+        score = 0;
         int iteration = 0;
         int rand = (int)(Math.random() * range) + min;
         BufferedReader bf = new BufferedReader(new FileReader(fileName));
         Scanner reader;
         //array contains the number of letters in the word
-        String[] word = null;
+        String word = "";
 
         try {
             reader = new Scanner(bf);
@@ -101,30 +94,23 @@ public class SinglePlayer {
             throw new RuntimeException(e);
         }
         for (int i = 0; i != rand; i++){
-            String line = reader.nextLine();
-            word = line.split(",");
+            word = reader.nextLine();
         }
-        int numOfDashes = Integer.parseInt(word[0]);
+        int numOfDashes = word.length();
         String dashes = "";
-//        for(int i = 0; i<numOfDashes; i++){
-//            dashes.concat("_");
-//        }
-
         serverMsg = "3,Be ware The server will only read the first character \nof the string if one is entered. \nso please enter a single character!";
         dataOutputStream.writeUTF(serverMsg);
         dataOutputStream.flush();
         while (true){
             boolean rightLetter = false;
-            serverMsg = "3,The word: ";
-            dataOutputStream.writeUTF(serverMsg);
-            dataOutputStream.flush();
             if(iteration == 0){
                 for(int i = 0; i<numOfDashes; i++){
                     dashes = dashes.concat("_");
                 }
             }else {
                 for(int i = 0; i<numOfDashes; i++){
-                    if(word[1].charAt(i) == clientMsg.charAt(0)){
+                    clientMsg = clientMsg.toLowerCase();
+                    if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
                         StringBuilder stringBuilder = new StringBuilder(dashes);
                         stringBuilder.setCharAt(i, clientMsg.charAt(0));
                         dashes = stringBuilder.toString();
@@ -132,36 +118,81 @@ public class SinglePlayer {
                         score++;
                         rightLetter = true;
                     }
-//                    else {
-//                        dashes = dashes.concat("_");
-//                    }
                 }
             }
             if (numOfAttempts == 0){
+                serverMsg = "3,You have failed! Shame on you... \nThe word was: "+ word +"\nBetter luck next time...." ;
+                String num = Integer.toString(score);
+                addScoreToUser(num);
+                dataOutputStream.writeUTF(serverMsg);
+                dataOutputStream.flush();
                 break;
             }
-            else if (score == Integer.parseInt(word[0])){
+            else if (score == word.length()){
+                serverMsg = "3,Well Done!!!\nScore: "+ score ;
+                String num = Integer.toString(score);
+                addScoreToUser(num);
+                dataOutputStream.writeUTF(serverMsg);
+                dataOutputStream.flush();
                 break;
             }
-
             if (rightLetter == false){
                 numOfAttempts--;
             }
+            serverMsg = "3,\nScore: "+ score +"\nNumber of attempts: "+ numOfAttempts +"\nThe word: ";
+            dataOutputStream.writeUTF(serverMsg);
+            dataOutputStream.flush();
             dataOutputStream.writeUTF("1,"+dashes);
             dataOutputStream.flush();
             clientMsg = ((String) dataInputStream.readUTF());
             iteration++;
-
         }
     }
 
 
     public void addScoreToUser(String Score){
-        //rewrite the line, and add ",0" in the end of the user line.
-
+        try( BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
+        {
+            int lineNum = 0;
+            BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
+            Scanner reader;
+            try {
+                reader = new Scanner(bf);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            while (reader.hasNext()) {
+                String line = reader.nextLine();
+                if (line.contains(user)) {
+                    bw.write(line + "," + score);
+                    bw.newLine();
+                    user = line + "," + score;
+                }else{
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try( BufferedWriter bw = new BufferedWriter(new FileWriter("RegisteredUsers.txt", false));)
+        {
+            int lineNum = 0;
+            BufferedReader bf = new BufferedReader(new FileReader("Score.txt"));
+            Scanner reader;
+            try {
+                reader = new Scanner(bf);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            while (reader.hasNext()) {
+                String line = reader.nextLine();
+                bw.write(line);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void modifyScoreOfUser(String Score){
-        //gets that specific line, and adds, or subtracts a point to the last score.
-    }
 }

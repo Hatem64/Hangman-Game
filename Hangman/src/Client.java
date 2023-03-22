@@ -21,7 +21,7 @@ public class Client{
             reader = new DataInputStream(socket.getInputStream());
             scanner = new Scanner(System.in);
 
-            while(!clientMsg.equals("-")){
+            while(!clientMsg.equals("exit")){
                 serverMsg = (String) reader.readUTF();
                 returnedMsg = serverMsg.split(",");
                 if(!serverMsg.equals(""))
@@ -31,7 +31,12 @@ public class Client{
                     continue;
                 }
                 System.out.print("Client: ");
-                clientMsg = scanner.nextLine();
+                try {
+                    clientMsg = scanner.nextLine();
+
+                }catch (Exception e){
+                    System.out.println("Please enter a valid input");
+                }
                 send(socket, clientMsg);
             }
             close(scanner, socket, reader);
