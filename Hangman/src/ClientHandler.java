@@ -17,7 +17,7 @@ public class ClientHandler implements Runnable{
     ImpUserServices impUserServices = new ImpUserServices();
     SinglePlayer singlePlayer;
     String selected = "";
-    ArrayList<String> clientMsgs = new ArrayList<>();
+    ArrayList<String> clientMsgs;
 
     public ClientHandler(Socket socket) {
         this.client = socket;
@@ -50,6 +50,7 @@ public class ClientHandler implements Runnable{
     public String registrationAndLoginMenu(){
         try {
             while (true){
+                clientMsgs = new ArrayList<>();
                 String[] returnedMsg = null;
                 serverMsg = "1,Welcome! Please login to play or create a new user!! \n 1-Login \n 2-Register \n 3-Exit Program";
                 dataOutputStream.writeUTF(serverMsg);
@@ -108,7 +109,7 @@ public class ClientHandler implements Runnable{
                 System.out.println("Client: " + selected);
                 switch (selected){
                     case "1":
-                        singlePlayer = new SinglePlayer(clientMsgs, client);
+                        singlePlayer = new SinglePlayer(clientMsgs.get(0), client);
                         singlePlayer.selectGameDifficulty();
                         break;
                     case "2":
