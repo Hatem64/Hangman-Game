@@ -22,6 +22,10 @@ public class Multiplayer {
         waitingPlayers.addAll(players);
     }
 
+    public List<ImpUserServices> getWaitingPlayers() {
+        return waitingPlayers;
+    }
+
     public void creeateTeam(String name, ClientHandler player) {
         if (teams.containsKey(name)) {
             player.sendMessage("Team name is already taken. Please choose a different name.");
@@ -48,7 +52,7 @@ public class Multiplayer {
 
     //Function to start a game between two teams
     // The parameter mode will be used for selecting 1v1 / 2v2
-    public void startGame(Team team1, Team team2, int mode) {
+    public void startGame(Team team1, Team team2, String mode) {
         if (team1.getNumPlayers() != team2.getNumPlayers()) {
             for (ClientHandler player : team1.getPlayers()) {
                 player.sendMessage("Error: Number of players in both teams is not equal.");
@@ -59,7 +63,13 @@ public class Multiplayer {
         } else {
             //Start the game
             //To be continued
-            
+            if(mode=="1"){
+                //1v1
+                //To be continued ..
+            } else if (mode=="2") {
+                //2v2
+                //To be continued ..
+            }
         }
     }
 
