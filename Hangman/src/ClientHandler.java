@@ -19,6 +19,9 @@ public class ClientHandler implements Runnable{
     String selected = "";
     ArrayList<String> clientMsgs;
 
+    private Team team;
+
+
     public ClientHandler(Socket socket) {
         this.client = socket;
         try {
@@ -64,7 +67,6 @@ public class ClientHandler implements Runnable{
                             dataOutputStream.writeUTF(serverMsg);
                             dataOutputStream.flush();
                             clientMsgs.add((String) dataInputStream.readUTF());
-//                            System.out.println("Client: " + clientMsg);
                         }
                         serverMsg = impUserServices.login(clientMsgs.get(0), clientMsgs.get(1));
                         returnedMsg = serverMsg.split(",");
@@ -132,6 +134,27 @@ public class ClientHandler implements Runnable{
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+    public void sendMessage(String message) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(client.getOutputStream());
+            outputStream.writeUTF(message);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String readMessage() throws IOException {
+        String message = null;
+        if (dataInputStream != null) {
+            message = dataInputStream.readUTF();
+        }
+        return message;
+    }
+
+    public void setTeam(Team team){
+        this.team=team;
     }
 
 }

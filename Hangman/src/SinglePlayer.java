@@ -114,7 +114,6 @@ public class SinglePlayer {
                         StringBuilder stringBuilder = new StringBuilder(dashes);
                         stringBuilder.setCharAt(i, clientMsg.charAt(0));
                         dashes = stringBuilder.toString();
-//                        dashes = dashes.concat(String.valueOf(clientMsg.charAt(0)));
                         score++;
                         rightLetter = true;
                     }

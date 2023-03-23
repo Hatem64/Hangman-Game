@@ -1,11 +1,14 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 public class ImpUserServices implements UserServices{
     private String name;
     private String userName;
     private String password;
+    private List<Integer> scores;
+
     private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
@@ -13,7 +16,27 @@ public class ImpUserServices implements UserServices{
     private String word;
     private String guess;
 
-    public ImpUserServices() {}
+    private boolean isLoggedIn;
+
+    public ImpUserServices(){
+
+    }
+
+    public ImpUserServices(String name, String userName, String password, List<Integer> scores) {
+        this.name = name;
+        this.userName = userName;
+        this.password = password;
+        this.scores = scores;
+        this.isLoggedIn=false;
+    }
+
+    public List<Integer> getScores() {
+        return scores;
+    }
+
+    public void setScores(List<Integer> scores) {
+        this.scores = scores;
+    }
 
     public String getName() {
         return name;
@@ -112,6 +135,7 @@ public class ImpUserServices implements UserServices{
                     else {
                         x = true;
                         y = true;
+                        isLoggedIn=true;
                         break;
                     }
                 }
@@ -126,5 +150,8 @@ public class ImpUserServices implements UserServices{
                     return str;
                 }
             }
+    }
+    public boolean isLoggedIn() {
+        return isLoggedIn;
     }
 }
