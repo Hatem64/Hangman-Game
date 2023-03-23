@@ -16,8 +16,12 @@ public class ClientHandler implements Runnable{
     DataInputStream dataInputStream;
     ImpUserServices impUserServices = new ImpUserServices();
     SinglePlayer singlePlayer;
+    Multiplayer multiplayer;
     String selected = "";
     ArrayList<String> clientMsgs;
+    ClientHandler player;
+    String teamName;
+    String modeOption;
 
     private Team team;
 
@@ -114,7 +118,48 @@ public class ClientHandler implements Runnable{
                         singlePlayer = new SinglePlayer(clientMsgs.get(0), client);
                         singlePlayer.selectGameDifficulty();
                         break;
+
                     case "2":
+                        multiplayer=new Multiplayer();
+                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
+
+                        player.sendMessage("Select one of the following options! \n 1-Create a team \n 2-Join an existing team");
+                        String teamOption=player.readMessage();
+                        if(teamOption=="1")
+                        {
+                            player.sendMessage("Enter a unique team name ;)");
+                            teamName=player.readMessage();
+                            Team team=new Team(teamName);
+                            player.setTeam(team);
+                            multiplayer.creeateTeam(teamName,player);
+                        }
+                        else if (teamOption=="2") {
+                            player.sendMessage("Enter the name of the team you want to join: \n");
+                            teamName= player.readMessage();
+                            Team team=new Team(teamName);
+                            player.setTeam(team);
+                            multiplayer.joinTeam(teamName,player);
+                        }
+                        else {
+                            player.sendMessage("Invalid option.");
+                            break;
+                        }
+                        player.sendMessage("Select one of the following \n 1- 1v1 \n 2- 2v2");
+                        modeOption=player.readMessage();
+                        if(modeOption=="1"){
+                            //Team team1 = new Team(<team-name>);
+                            //Team team2 = new Team(<team-name>);
+                            //They should play 1v1
+                            //multiplayer.startGame(team1,team2,"1")
+                        } else if (modeOption=="2") {
+                            // 2 teams 4 players
+                            // 2v2
+                        }
+                        //Two teams should be created
+
+
+                        break;
+                    case "3":
                         for(int i =0; i<3; i++){
                             serverMsg = "";
                             dataOutputStream.writeUTF(serverMsg);
@@ -126,7 +171,7 @@ public class ClientHandler implements Runnable{
                         dataOutputStream.writeUTF(serverMsg);
                         dataOutputStream.flush();
                         break;
-                    case "3":
+                    case "4":
                         return "exit";
                 }
 
