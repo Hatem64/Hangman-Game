@@ -166,32 +166,23 @@ public class ClientHandler implements Runnable{
 //                                    Server.add();
                                     //multiplayer.startGame(team1,team2,"1")
                                 } else if (modeOption=="2") {
-                                    ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
-                                    for (int i = 0; i< gameMasters.size(); i++){
-                                        sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
-                                    }
-                                    sendMessage("1, select one of the above rooms to join!");
-                                    selected = readMessage();
-                                    if(Integer.parseInt(selected) > gameMasters.size()) {
-                                        sendMessage("3,Please choose one of the rooms!!");
-                                        continue;
-                                    }
-                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinTeam(this);
+
 
                                 }
                                 //Two teams should be created
                             }
                             else if (teamOption=="2") {
-                                //list game rooms, and then check the mode, if 1v1, then automatically go to team 2, if 2v2, and
-                                //the both teams has space, then select which team to enter, if one team is full, then
-                                //automatically go to the other team
-                                ArrayList<ClientHandler> currentGameMasters = Server.getGameMasters();
-                                for(int i = 0; i<currentGameMasters.size(); i++){
-                                    sendMessage("3,Room " + (i+1) +": "+ currentGameMasters.get(i).getGameRoomName());
+                                ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
+                                for (int i = 0; i< gameMasters.size(); i++){
+                                    sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
                                 }
-                                sendMessage("1,Select one of the above rooms to join!");
+                                sendMessage("1, select one of the above rooms to join!");
                                 selected = readMessage();
-//                                sendMessage("1, ");
+                                if(Integer.parseInt(selected) > gameMasters.size()) {
+                                    sendMessage("3,Please choose one of the rooms!!");
+                                    continue;
+                                }
+                                gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinTeam(this);
                             }
                             else if (teamOption=="3") {
                                 break;
@@ -243,10 +234,6 @@ public class ClientHandler implements Runnable{
         }
         return message;
     }
-
-//    public void setTeam(Team team){
-//        this.team=team;
-//    }
 
     public void setTeam(int num){
         if(num == 1){
