@@ -11,6 +11,8 @@ public class ClientHandler implements Runnable{
     private Scanner scanner = null;
 //    String clientMsg = "";
     String functionMsg = "";
+    String functionMsg2 = "";
+
     String serverMsg = "";
     DataOutputStream dataOutputStream;
     DataInputStream dataInputStream;
@@ -43,15 +45,29 @@ public class ClientHandler implements Runnable{
 
     }
 
+    public Socket getClient() {
+        return client;
+    }
+
+    public DataOutputStream getDataOutputStream() {
+        return dataOutputStream;
+    }
+
+    public DataInputStream getDataInputStream() {
+        return dataInputStream;
+    }
+
     @Override
     public void run() {
         try {
             //Menu Functions will be placed here!
             functionMsg = registrationAndLoginMenu();
             if (functionMsg.equals("2")){
-                gameMenu();
-
+                functionMsg2 = gameMenu();
             }
+//            if (functionMsg2.equals("2")){
+//
+//            }
             dataOutputStream.close();
             scanner.close();
         } catch (IOException e) {
@@ -124,7 +140,7 @@ public class ClientHandler implements Runnable{
                         singlePlayer.selectGameDifficulty();
                         break;
                     case "2":
-                        multiplayer=new Multiplayer();
+                        multiplayer=new Multiplayer(this);
 //                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
                         while (true){
                             sendMessage("1,Select one of the following options! \n 1-Create a game room \n 2-Join an existing game \n 3-back");
@@ -143,7 +159,9 @@ public class ClientHandler implements Runnable{
                                 sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
                                 modeOption=readMessage();
                                 if(modeOption=="1"){
-                                    multiplayer.startGame(team1, team2, 1);
+                                    multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
+                                    multiplayer.gameMenu();
+                                    return "2";
                                     //They should play 1v1
 //                                    Server.add();
                                     //multiplayer.startGame(team1,team2,"1")

@@ -2,6 +2,8 @@ import java.io.*;
 import java.util.*;
 
 public class Multiplayer {
+
+    String selected = "";
     int numOfAttempts = 0;
     int max = 20;
     int min = 1;
@@ -10,17 +12,24 @@ public class Multiplayer {
     String clientMsg = "";
     private String user = null;
     int score = 0;
+    Team team1;
+    Team team2;
+    ClientHandler clientHandler;
+    int mode = 0;
+    String roomName = "";
+
     // List of all players waiting to join a team
     // I'm not sure about the type of the list ya hatem
     private volatile List<ClientHandler> waitingPlayers = new ArrayList<ClientHandler>();
     // Map of all teams
-//    private final Map<String, Team> teams = new HashMap<>();
+    private final Map<String, Team> teams = new HashMap<>();
 
 //    ArrayList<Team> gameRoom = new ArrayList<>();
 //    Team team1 = new Team();
 //    Team team2 = new Team();
 
-    public Multiplayer() {
+    public Multiplayer(ClientHandler clientHandler) {
+        this.clientHandler = clientHandler;
 //        List<ImpUserServices> players = loadLoggedInPlayers("RegisteredUsers.txt");
         // Add all players to waiting list
 //        waitingPlayers.addAll(players);
@@ -42,27 +51,75 @@ public class Multiplayer {
 //        }
 //    }
 
-    public void joinTeam(ClientHandler player, Team team) {
+    public void gameMenu(){
+        try {
+            while (true){
+                ArrayList<String> clientMsgs = new ArrayList<>();
+                String[] returnedMsg = null;
+                serverMsg = "1,Please select one of the below options!! \n 1-Start Game \n 2-Reload game teams \n 3-Check players score history \n 4-Exit Program";
+                sendMessage(serverMsg);
+                selected = readMessage();
+                System.out.println("Client: " + selected);
+                switch (selected){
+                    case "1":
+                        startGame();
+                        break;
+                    case "2":
+                        sendMessage("3,Team 1 contains: ");
+                        for (ClientHandler player : team1.getPlayers()) {
+                            sendMessage("3,"+player.getImpUserServices().getName());
+                        }
+                        sendMessage("3,Team 2 contains: ");
+                        for (ClientHandler player : team2.getPlayers()) {
+                            sendMessage("3,"+player.getImpUserServices().getName());
+                        }
+                        break;
+                    case "3":
+                        return "exit";
+                }
 
-        //thinking of taking this method and implement it in the clienthandler class, so that
-        //the player that selects join a game, will have this logic, and to check which mode the game he selected is.
-
-        if (!teams.containsKey(name)) {
-            player.sendMessage("Team does not exist. Please enter a valid team name.");
-        } else {
-            // Add the player to the team
-            Team team = teams.get(name);
-            team.addPlayer(player);
-            player.setTeam(team);
-            player.sendMessage("Joined the team successfully");
+            }
+        }catch (IOException e){
+            throw new RuntimeException(e);
         }
+    }
+
+    public void joinTeam(ClientHandler playerToJoin) {
+
+        if(mode == 1){
+            team2.addPlayer(playerToJoin);
+        }else {
+            if (team1.getNumPlayers() < 2){
+                team1.addPlayer(playerToJoin);
+            }else {
+                team2.addPlayer(playerToJoin);
+            }
+        }
+
+//        if (!teams.containsKey(name)) {
+//            player.sendMessage("Team does not exist. Please enter a valid team name.");
+//        } else {
+//            // Add the player to the team
+//            Team team = teams.get(name);
+//            team.addPlayer(player);
+//            player.setTeam(team);
+//            player.sendMessage("Joined the team successfully");
+//        }
+    }
+
+
+    public void createGameRoom(Team team1, Team team2, String roomName, int mode){
+        this.team1 = team1;
+        this.team2 = team2;
+        this.mode = mode;
+        this.roomName = roomName;
     }
 
     //Function to start a game between two teams
     // The parameter mode will be used for selecting 1v1 / 2v2
 
     //I think this should check the mode first, then decide whether the team count is equal or not.
-    public void startGame(Team team1, Team team2, int mode) {
+    public void startGame() {
         if (team1.getNumPlayers() != team2.getNumPlayers()) {
             for (ClientHandler player : team1.getPlayers()) {
                 player.sendMessage("Error: Number of players in both teams is not equal.");
@@ -82,6 +139,7 @@ public class Multiplayer {
             }
         }
     }
+
 
 //    public List<ImpUserServices> loadLoggedInPlayers(String fileName) {
 //        List<ImpUserServices> players = new ArrayList<>();
@@ -258,6 +316,23 @@ public class Multiplayer {
 
     }
 
+    public void sendMessage(String message) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(clientHandler.getClient().getOutputStream());
+            outputStream.writeUTF(message);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String readMessage() throws IOException {
+        String message = null;
+        if (clientHandler.getDataInputStream() != null) {
+            message = clientHandler.getDataInputStream().readUTF();
+        }
+        return message;
+    }
 
 
 
