@@ -177,7 +177,7 @@ public class ClientHandler implements Runnable{
                                     //case 2; one of the teams is full, so the player will automatically join the empty team, whether it
                                     //has no players or 1 player.
 
-                                    multiplayer.startGame(team1, team2, 1);
+//                                    multiplayer.startGame(team1, team2, 1);
                                     // 2 teams 4 players
                                     // 2v2
                                 }
@@ -245,10 +245,6 @@ public class ClientHandler implements Runnable{
         }
         return message;
     }
-
-//    public void setTeam(Team team){
-//        this.team=team;
-//    }
 
     public void setTeam(int num){
         if(num == 1){
