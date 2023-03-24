@@ -245,22 +245,18 @@ public class ClientHandler implements Runnable{
         }
         return message;
     }
-
     public void setTeam(int num){
         if(num == 1){
             team1.addPlayer(this);
         }else
             team2.addPlayer(this);
     }
-
     public String getGameRoomName(){
         return gameRoomName;
     }
-
     public ImpUserServices getImpUserServices() {
         return impUserServices;
     }
-
     public boolean isGameMaster(){
         return isGameMaster;
     }
