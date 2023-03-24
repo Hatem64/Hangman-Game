@@ -166,20 +166,18 @@ public class ClientHandler implements Runnable{
 //                                    Server.add();
                                     //multiplayer.startGame(team1,team2,"1")
                                 } else if (modeOption=="2") {
+                                    ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
+                                    for (int i = 0; i< gameMasters.size(); i++){
+                                        sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
+                                    }
+                                    sendMessage("1, select one of the above rooms to join!");
+                                    selected = readMessage();
+                                    if(Integer.parseInt(selected) > gameMasters.size()) {
+                                        sendMessage("3,Please choose one of the rooms!!");
+                                        continue;
+                                    }
+                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinTeam(this);
 
-                                    //I want to make a function to just make the game, and that function will keep checking on the number of players and
-                                    //and inside it is the startgame method.
-
-                                    //the set team method in the two modes are going to be different, for example, in mode 1,
-                                    //the other player will be autmatically be added to the other team
-                                    //but in mode 2, we have several cases, case 1; both teams has empty space in it (such as 1 player in each team,
-                                    //or the other team is empty.
-                                    //case 2; one of the teams is full, so the player will automatically join the empty team, whether it
-                                    //has no players or 1 player.
-
-                                    multiplayer.startGame(team1, team2, 1);
-                                    // 2 teams 4 players
-                                    // 2v2
                                 }
                                 //Two teams should be created
                             }

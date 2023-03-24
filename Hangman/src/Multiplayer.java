@@ -172,7 +172,7 @@ public class Multiplayer {
         Team currentTeam = team1;
         Team opponentTeam = team2;
 
-        while (team1 > 0){
+        while (team1.numAttempts != 0 || team2.numAttempts != 0 || das){
             //synchronized to ensure that only one player can make a move at a time.
             synchronized (currentTeam.getPlayer(currentPlayerIndex)){
                 //currentPlayer.wait();
