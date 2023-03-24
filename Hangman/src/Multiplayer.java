@@ -4,7 +4,6 @@ import java.util.*;
 public class Multiplayer {
 
     String selected = "";
-    int numOfAttempts = 0;
     int max = 20;
     int min = 1;
     int range = max - min + 1;
@@ -17,6 +16,9 @@ public class Multiplayer {
     ClientHandler clientHandler;
     int mode = 0;
     String roomName = "";
+    String word = "";
+    String dashes = "";
+    int itertaion=0;
 
     // List of all players waiting to join a team
     // I'm not sure about the type of the list ya hatem
@@ -75,7 +77,7 @@ public class Multiplayer {
                         }
                         break;
                     case "3":
-                        return "exit";
+                        
                 }
 
             }
@@ -108,14 +110,6 @@ public class Multiplayer {
     }
 
 
-    public void createGameRoom(Team team1, Team team2, String roomName, int mode){
-        this.team1 = team1;
-        this.team2 = team2;
-        this.mode = mode;
-        this.roomName = roomName;
-
-
-    }
 
     //Function to start a game between two teams
     // The parameter mode will be used for selecting 1v1 / 2v2
@@ -172,18 +166,20 @@ public class Multiplayer {
         Team currentTeam = team1;
         Team opponentTeam = team2;
 
-        while (team1 > 0){
-            //synchronized to ensure that only one player can make a move at a time.
+        while (team1.numAttempts!=0 || team2.numAttempts!=0){
             synchronized (currentTeam.getPlayer(currentPlayerIndex)){
-                //currentPlayer.wait();
                 ClientHandler currentPlayer = currentTeam.getPlayer(currentPlayerIndex);
-                ClientHandler opponent = opponentTeam.getPlayer(opponentPlayerIndex);
-
                 currentPlayer.sendMessage("Your turn. Enter a letter: ");
-                String guess = currentPlayer.readMessage();
 
-                //guess must be validated somehow => call the game logic function
                 game(currentTeam, currentPlayer);
+
+                if (!dashes.equals("_")){
+                    //for loop to track all players and tell them they won
+                    for (ClientHandler player : currentTeam.getPlayers()) {
+                        player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
+                    }
+                    break;
+                }
 
                 if (currentTeam == team1) {
                     currentTeam = team2;
@@ -192,23 +188,40 @@ public class Multiplayer {
                     currentTeam = team1;
                     opponentTeam = team2;
                 }
+
                 // % currentTeam.size() wrap it around to 0 when it reaches the end of the list.
                 currentPlayerIndex = (currentPlayerIndex + 1) % currentTeam.getNumPlayers();
                 opponentPlayerIndex = (opponentPlayerIndex + 1) % opponentTeam.getNumPlayers();
+                itertaion++;
             }
         }
+        if (team1.numAttempts == 0){
+            for (ClientHandler player : team1.getPlayers()) {
+                player.sendMessage("3,You have failed! Shame on you... \nThe word was: "+ word +"\nBetter luck next time....");
+            }
+        }
+        if (team2.numAttempts == 0){
+            for (ClientHandler player : team2.getPlayers()) {
+                player.sendMessage("3,You have failed! Shame on you... \nThe word was: "+ word +"\nBetter luck next time....");
+            }
+        }
+
+//        for (int i =0 ; i<currentTeam.getNumPlayers();i++)
+//        {
+//            team1.setScore(currentTeam);
+//            team2.setScore(opponentTeam.score);
+//        }
+
     }
-    public void game(Team team, ClientHandler player) throws IOException {
-//        ClientHandler player = null;
-        this.numOfAttempts = numOfAttempts;
-        int score = 0;
-        int iteration = 0;
+    public void createGameRoom(Team team1, Team team2, String roomName, int mode) throws FileNotFoundException {
+        this.team1 = team1;
+        this.team2 = team2;
+        this.mode = mode;
+        this.roomName = roomName;
+
         int rand = (int)(Math.random() * range) + min;
         BufferedReader bf = new BufferedReader(new FileReader("EasyGame.txt"));
         Scanner reader;
-        //array contains the number of letters in the word
-        String word = "";
-
         try {
             reader = new Scanner(bf);
         } catch (Exception e) {
@@ -217,49 +230,35 @@ public class Multiplayer {
         for (int i = 0; i != rand; i++){
             word = reader.nextLine();
         }
-        String dashes = "";
+    }
+
+    public void game(Team team, ClientHandler player) throws IOException {
         player.sendMessage("3,Be ware The server will only read the first character \nof the string if one is entered. \nso please enter a single character!");
-        while (true){
-            boolean rightLetter = false;
-            if(iteration == 0){
-                for(int i = 0; i<word.length(); i++){
-                    dashes = dashes.concat("_");
+        boolean rightLetter = false;
+        if(itertaion == 0){
+            for(int i = 0; i<word.length(); i++){
+                dashes = dashes.concat("_");
+            }
+        }else {
+            player.sendMessage("3,\nScore: "+ team.score +"\nNumber of attempts: "+ team.numAttempts +"\nThe word: ");
+            player.sendMessage("1" + dashes);
+            clientMsg=player.readMessage();
+            for(int i = 0; i<word.length(); i++){
+                clientMsg = clientMsg.toLowerCase();
+                if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
+                    StringBuilder stringBuilder = new StringBuilder(dashes);
+                    stringBuilder.setCharAt(i, clientMsg.charAt(0));
+                    dashes = stringBuilder.toString();
+                    score++;
+                    rightLetter = true;
                 }
-            }else {
-                for(int i = 0; i<word.length(); i++){
-                    clientMsg = clientMsg.toLowerCase();
-                    if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
-                        StringBuilder stringBuilder = new StringBuilder(dashes);
-                        stringBuilder.setCharAt(i, clientMsg.charAt(0));
-                        dashes = stringBuilder.toString();
-                        score++;
-                        rightLetter = true;
-                    }
-                }
             }
-            if (numOfAttempts == 0){
-                player.sendMessage("3,You have failed! Shame on you... \nThe word was: "+ word +"\nBetter luck next time...." );
-                String num = Integer.toString(score);
-                addScoreToUser(num);
-                break;
-            }
-            else if (!dashes.equals("_")){
-                player.sendMessage("3,Well Done!!!\nScore: "+ score);
-                String num = Integer.toString(score);
-                addScoreToUser(num);
-                break;
-            }
+        }
             if (rightLetter == false){
                 team.numAttempts--;
             }
-            player.sendMessage("3,\nScore: "+ score +"\nNumber of attempts: "+ numOfAttempts +"\nThe word: ");
-            player.sendMessage("1" + dashes);
-            player.readMessage();
-            iteration++;
-        }
     }
-
-    public void addScoreToUser(String Score){
+    public void addScoreToUser(Team team){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
             int lineNum = 0;
@@ -270,15 +269,20 @@ public class Multiplayer {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            while (reader.hasNext()) {
-                String line = reader.nextLine();
-                if (line.contains(user)) {
-                    bw.write(line + "," + score);
-                    bw.newLine();
-                    user = line + "," + score;
-                }else{
-                    bw.write(line);
-                    bw.newLine();
+
+            for (ClientHandler player : team.getPlayers()) {
+                //Add variable in impuser of this clientHandler that contains the user line in the registeredUsers.txt
+                //therefore we can call it in this for loop to check if this line located in this file so we can update the score.
+                while (reader.hasNext()) {
+                    String line = reader.nextLine();
+                    if (line.contains(player.getNumberUsers())) {
+                        bw.write(line + "," + score);
+                        bw.newLine();
+                        user = line + "," + score;
+                    }else{
+                        bw.write(line);
+                        bw.newLine();
+                    }
                 }
             }
         } catch (IOException e) {
