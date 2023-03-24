@@ -29,4 +29,8 @@ public class Team {
     public String getTeamName(){
         return name;
     }
+
+    public ClientHandler getPlayer(int num){
+        return players.get(num);
+    }
 }

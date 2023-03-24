@@ -12,22 +12,24 @@ public class ImpUserServices implements UserServices{
     private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
-
     private String word;
     private String guess;
 
     private boolean isLoggedIn;
 
-    public ImpUserServices(){
-
+    public ImpUserServices(Socket clientSocket){
+        this.isLoggedIn = false;
+        this.clientSocket = clientSocket;
     }
 
-    public ImpUserServices(String name, String userName, String password, List<Integer> scores) {
+    public ImpUserServices(String name, String userName, String password, List<Integer> scores, Socket clientSocket) {
         this.name = name;
         this.userName = userName;
         this.password = password;
         this.scores = scores;
-        this.isLoggedIn=false;
+        this.isLoggedIn = false;
+        this.clientSocket = clientSocket;
+
     }
 
     public List<Integer> getScores() {
@@ -62,17 +64,6 @@ public class ImpUserServices implements UserServices{
         this.password = password;
     }
 
-
-
-//    public ImpUserServices(Socket clientSocket) {
-//        this.clientSocket = clientSocket;
-//        try {
-//            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//            out = new PrintWriter(clientSocket.getOutputStream(), true);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public String register(String name,String userName,String password) throws IOException {
@@ -125,6 +116,12 @@ public class ImpUserServices implements UserServices{
             while(reader.hasNextLine()){
                 String line = reader.nextLine();
                 user = line.split(",");
+                setUserName(userName);
+                setPassword(password);
+                if(Server.checkLogged(userName))
+                {
+                    return "3,User already logged in!!";
+                }
                 if(!user[1].equals(userName)){
                     x = false;
                 }else{
@@ -135,17 +132,20 @@ public class ImpUserServices implements UserServices{
                     else {
                         x = true;
                         y = true;
+                        setName(user[0]);
                         isLoggedIn=true;
                         break;
                     }
                 }
             }
+
             if(x == false){
                 return "3,404 username not found!";
             }else{
                 if(y == false){
                     return "3,401 unauthorized access!";
                 }else {
+                    isLoggedIn = true;
                     String str = "2,Welcome " + user[0];
                     return str;
                 }
@@ -153,5 +153,15 @@ public class ImpUserServices implements UserServices{
     }
     public boolean isLoggedIn() {
         return isLoggedIn;
+    }
+
+    public void sendMessage(String message) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+            outputStream.writeUTF(message);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

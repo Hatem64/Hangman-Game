@@ -1,18 +1,21 @@
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Server {
+    static final ArrayList<ClientHandler> clientsList = new ArrayList<>();
+    private static volatile ArrayList<ClientHandler> loggedInPlayers = new ArrayList<>();
+    private static volatile ArrayList<ClientHandler> masters = new ArrayList<>();
+
     public static void main(String[] args) {
-        String username = "";
-        String password = "";
         try{
             ServerSocket serverSocket = new ServerSocket(6666);
             while (true){
                 Socket client = serverSocket.accept();
-                ImpUserServices impUserServices= new ImpUserServices();
+                ImpUserServices impUserServices= new ImpUserServices(client);
                 System.out.println("New client connected " + client.getInetAddress().getHostAddress());
                 ClientHandler clientHandler = new ClientHandler(client);
+                addPlayer(clientHandler);
                 new Thread(clientHandler).start();
                 //list ->
             }
@@ -21,30 +24,40 @@ public class Server {
         }
     }
 
-//    private static class GameServer implements Runnable {
-//
-//        //dah hy2sm el servers le 3dd el clients
-//        //lo single player hyfdl 3la el server bta3o
-//        //lo multiplayer hy2dr y2ma y3ml room 3la el server dah, ya hy3ml join le server tany
-//        //m4 3arf lessa hal 23ml function bta5od clients tanyeen 2zay in case of multiplayer...
-//        //y3ny hal 22dr 25ly function bt3ml accept lel clients el tanyeen? wla el function deh bta5od array?
-//        //ana h4oof 2wl wa7da.
-//
-////    private int port;
-////    public GameServer(int port) throws IOException {
-////        this.port = port;
-////    }
-//
-//
-//
-//        public void run()
-//        {
-//
-//        }
-//
-//
-//    }
+    public static void addPlayer(ClientHandler player){
+        loggedInPlayers.add(player);
+    }
 
+    public static boolean checkLogged(String name){
+        for(int i=0; i<loggedInPlayers.size(); i++){
+            System.out.println(loggedInPlayers.get(i).getImpUserServices().getUserName());
+            if (loggedInPlayers.get(i).getImpUserServices().getUserName().equals(name))
+                return loggedInPlayers.get(i).getImpUserServices().isLoggedIn();
+        }
+        return false;
+    }
+
+    public static ArrayList<ClientHandler> getLoggedInPlayers() {
+        return loggedInPlayers;
+    }
+
+    public static ArrayList<ClientHandler> getGameMasters(){
+        for(int i=0; i<loggedInPlayers.size(); i++){
+            if(loggedInPlayers.get(i).isGameMaster()){
+                masters.add(loggedInPlayers.get(i));
+            }
+        }
+        return masters;
+    }
+
+    public static boolean checkUniqueness(String name){
+        ArrayList<ClientHandler> temp = masters;
+        for(ClientHandler client : temp){
+            if(client.getGameRoomName().equals(name))
+                return false;
+        }
+        return true;
+    }
 }
 
 
