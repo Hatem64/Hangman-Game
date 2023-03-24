@@ -113,13 +113,15 @@ public class Multiplayer {
         this.team2 = team2;
         this.mode = mode;
         this.roomName = roomName;
+
+
     }
 
     //Function to start a game between two teams
     // The parameter mode will be used for selecting 1v1 / 2v2
 
     //I think this should check the mode first, then decide whether the team count is equal or not.
-    public void startGame() {
+    public void startGame() throws IOException {
         if (team1.getNumPlayers() != team2.getNumPlayers()) {
             for (ClientHandler player : team1.getPlayers()) {
                 player.sendMessage("Error: Number of players in both teams is not equal.");
@@ -128,15 +130,7 @@ public class Multiplayer {
                 player.sendMessage("Error: Number of players in both teams is not equal.");
             }
         } else {
-            //Start the game
-            //To be continued
-            if(mode==1){
-                //1v1
-                //To be continued ..
-            } else if (mode==2) {
-                //2v2
-                //To be continued ..
-            }
+            turnTracker(team1, team2);
         }
     }
 
@@ -175,11 +169,10 @@ public class Multiplayer {
     public void turnTracker(Team team1, Team team2) throws IOException {
         int currentPlayerIndex=0;
         int opponentPlayerIndex=0;
-        int numAttempts=10;
         Team currentTeam = team1;
         Team opponentTeam = team2;
 
-        while (numAttempts > 0){
+        while (team1 > 0){
             //synchronized to ensure that only one player can make a move at a time.
             synchronized (currentTeam.getPlayer(currentPlayerIndex)){
                 //currentPlayer.wait();
@@ -190,7 +183,7 @@ public class Multiplayer {
                 String guess = currentPlayer.readMessage();
 
                 //guess must be validated somehow => call the game logic function
-                game(numOfAttempts,"EasyGame.txt");
+                game(currentTeam, currentPlayer);
 
                 if (currentTeam == team1) {
                     currentTeam = team2;
@@ -205,13 +198,13 @@ public class Multiplayer {
             }
         }
     }
-    public void game(int numOfAttempts, String fileName) throws IOException {
-        ClientHandler player = null;
+    public void game(Team team, ClientHandler player) throws IOException {
+//        ClientHandler player = null;
         this.numOfAttempts = numOfAttempts;
         int score = 0;
         int iteration = 0;
         int rand = (int)(Math.random() * range) + min;
-        BufferedReader bf = new BufferedReader(new FileReader(fileName));
+        BufferedReader bf = new BufferedReader(new FileReader("EasyGame.txt"));
         Scanner reader;
         //array contains the number of letters in the word
         String word = "";
@@ -224,17 +217,16 @@ public class Multiplayer {
         for (int i = 0; i != rand; i++){
             word = reader.nextLine();
         }
-        int numOfDashes = word.length();
         String dashes = "";
         player.sendMessage("3,Be ware The server will only read the first character \nof the string if one is entered. \nso please enter a single character!");
         while (true){
             boolean rightLetter = false;
             if(iteration == 0){
-                for(int i = 0; i<numOfDashes; i++){
+                for(int i = 0; i<word.length(); i++){
                     dashes = dashes.concat("_");
                 }
             }else {
-                for(int i = 0; i<numOfDashes; i++){
+                for(int i = 0; i<word.length(); i++){
                     clientMsg = clientMsg.toLowerCase();
                     if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
                         StringBuilder stringBuilder = new StringBuilder(dashes);
@@ -251,14 +243,14 @@ public class Multiplayer {
                 addScoreToUser(num);
                 break;
             }
-            else if (score == word.length()){
+            else if (!dashes.equals("_")){
                 player.sendMessage("3,Well Done!!!\nScore: "+ score);
                 String num = Integer.toString(score);
                 addScoreToUser(num);
                 break;
             }
             if (rightLetter == false){
-                numOfAttempts--;
+                team.numAttempts--;
             }
             player.sendMessage("3,\nScore: "+ score +"\nNumber of attempts: "+ numOfAttempts +"\nThe word: ");
             player.sendMessage("1" + dashes);

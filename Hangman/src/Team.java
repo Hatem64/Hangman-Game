@@ -4,6 +4,7 @@ import java.util.*;
 public class Team {
 
     private String name;
+    int numAttempts=4;
     private List<ClientHandler> players = new ArrayList<>();
 
     public Team(String name) {
