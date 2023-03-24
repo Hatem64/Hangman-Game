@@ -12,33 +12,41 @@ public class Multiplayer {
     int score = 0;
     // List of all players waiting to join a team
     // I'm not sure about the type of the list ya hatem
-    private final List<ImpUserServices> waitingPlayers = new ArrayList<ImpUserServices>();
+    private volatile List<ClientHandler> waitingPlayers = new ArrayList<ClientHandler>();
     // Map of all teams
-    private final Map<String, Team> teams = new HashMap<>();
+//    private final Map<String, Team> teams = new HashMap<>();
+
+//    ArrayList<Team> gameRoom = new ArrayList<>();
+//    Team team1 = new Team();
+//    Team team2 = new Team();
 
     public Multiplayer() {
-        List<ImpUserServices> players = loadLoggedInPlayers("RegisteredUsers.txt");
+//        List<ImpUserServices> players = loadLoggedInPlayers("RegisteredUsers.txt");
         // Add all players to waiting list
-        waitingPlayers.addAll(players);
+//        waitingPlayers.addAll(players);
     }
 
-    public List<ImpUserServices> getWaitingPlayers() {
+    public List<ClientHandler> getWaitingPlayers() {
         return waitingPlayers;
     }
 
-    public void creeateTeam(String name, ClientHandler player) {
-        if (teams.containsKey(name)) {
-            player.sendMessage("Team name is already taken. Please choose a different name.");
-        } else {
-            Team team = new Team(name);
-            team.addPlayer(player);
-            teams.put(name, team);
-            player.setTeam(team);
-            player.sendMessage("Team created successfully");
-        }
-    }
+//    public void createTeam(String name, ClientHandler player) {
+//        if (teams.containsKey(name)) {
+//            player.sendMessage("Team name is already taken. Please choose a different name.");
+//        } else {
+//            Team team = new Team(name);
+//            team.addPlayer(player);
+//            teams.put(name, team);
+//            player.setTeam(team);
+//            player.sendMessage("Team created successfully");
+//        }
+//    }
 
-    public void joinTeam(String name, ClientHandler player) {
+    public void joinTeam(ClientHandler player, Team team) {
+
+        //thinking of taking this method and implement it in the clienthandler class, so that
+        //the player that selects join a game, will have this logic, and to check which mode the game he selected is.
+
         if (!teams.containsKey(name)) {
             player.sendMessage("Team does not exist. Please enter a valid team name.");
         } else {
@@ -52,7 +60,9 @@ public class Multiplayer {
 
     //Function to start a game between two teams
     // The parameter mode will be used for selecting 1v1 / 2v2
-    public void startGame(Team team1, Team team2, String mode) {
+
+    //I think this should check the mode first, then decide whether the team count is equal or not.
+    public void startGame(Team team1, Team team2, int mode) {
         if (team1.getNumPlayers() != team2.getNumPlayers()) {
             for (ClientHandler player : team1.getPlayers()) {
                 player.sendMessage("Error: Number of players in both teams is not equal.");
@@ -63,65 +73,66 @@ public class Multiplayer {
         } else {
             //Start the game
             //To be continued
-            if(mode=="1"){
+            if(mode==1){
                 //1v1
                 //To be continued ..
-            } else if (mode=="2") {
+            } else if (mode==2) {
                 //2v2
                 //To be continued ..
             }
         }
     }
 
-    public List<ImpUserServices> loadLoggedInPlayers(String fileName) {
-        List<ImpUserServices> players = new ArrayList<>();
+//    public List<ImpUserServices> loadLoggedInPlayers(String fileName) {
+//        List<ImpUserServices> players = new ArrayList<>();
+//
+//        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] tokens = line.split(",");
+//                String name = tokens[0];
+//                String userName = tokens[1];
+//                String password = tokens[2];
+//                List<Integer> scores = new ArrayList<>();
+//
+//                if (tokens.length > 3) {
+//                    String[] scoresStr = tokens[3].split(",");
+//                    for (String scoreStr : scoresStr) {
+//                        int score = Integer.parseInt(scoreStr);
+//                        scores.add(score);
+//                    }
+//                }
+//                //hena keda fe impUser object gdeed, fa dyman hykoon false, fa m4 hy5o4 el list
+//                ImpUserServices player = new ImpUserServices(name, userName, password, scores);
+//                if(player.isLoggedIn()){
+//                    players.add(player);
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return players;
+//    }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(",");
-                String name = tokens[0];
-                String userName = tokens[1];
-                String password = tokens[2];
-                List<Integer> scores = new ArrayList<>();
-
-                if (tokens.length > 3) {
-                    String[] scoresStr = tokens[3].split(",");
-                    for (String scoreStr : scoresStr) {
-                        int score = Integer.parseInt(scoreStr);
-                        scores.add(score);
-                    }
-                }
-                ImpUserServices player = new ImpUserServices(name, userName, password, scores);
-                if(player.isLoggedIn()){
-                    players.add(player);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return players;
-    }
-
-    public void turnTracker(List<ClientHandler> team1, List<ClientHandler> team2) throws IOException {
+    public void turnTracker(Team team1, Team team2) throws IOException {
         int currentPlayerIndex=0;
         int opponentPlayerIndex=0;
         int numAttempts=10;
-        List<ClientHandler> currentTeam = team1;
-        List<ClientHandler> opponentTeam = team2;
+        Team currentTeam = team1;
+        Team opponentTeam = team2;
 
         while (numAttempts > 0){
             //synchronized to ensure that only one player can make a move at a time.
-            synchronized (currentTeam.get(currentPlayerIndex)){
+            synchronized (currentTeam.getPlayer(currentPlayerIndex)){
                 //currentPlayer.wait();
-                ClientHandler currentPlayer=currentTeam.get(currentPlayerIndex);
-                ClientHandler opponent= opponentTeam.get(opponentPlayerIndex);
+                ClientHandler currentPlayer = currentTeam.getPlayer(currentPlayerIndex);
+                ClientHandler opponent = opponentTeam.getPlayer(opponentPlayerIndex);
 
                 currentPlayer.sendMessage("Your turn. Enter a letter: ");
                 String guess = currentPlayer.readMessage();
 
                 //guess must be validated somehow => call the game logic function
-                game(numOfAttempts,"RegisteredUsers.txt");
+                game(numOfAttempts,"EasyGame.txt");
 
                 if (currentTeam == team1) {
                     currentTeam = team2;
@@ -131,8 +142,8 @@ public class Multiplayer {
                     opponentTeam = team2;
                 }
                 // % currentTeam.size() wrap it around to 0 when it reaches the end of the list.
-                currentPlayerIndex = (currentPlayerIndex + 1) % currentTeam.size();
-                opponentPlayerIndex = (opponentPlayerIndex + 1) % opponentTeam.size();
+                currentPlayerIndex = (currentPlayerIndex + 1) % currentTeam.getNumPlayers();
+                opponentPlayerIndex = (opponentPlayerIndex + 1) % opponentTeam.getNumPlayers();
             }
         }
     }
@@ -243,6 +254,9 @@ public class Multiplayer {
         }
     }
 
+    public void addTeamsToGameRoom(Team team1, Team team2){
+
+    }
 
 
 
