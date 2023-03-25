@@ -36,11 +36,6 @@ public class Server {
         }
         return false;
     }
-
-    public static ArrayList<ClientHandler> getLoggedInPlayers() {
-        return loggedInPlayers;
-    }
-
     public static ArrayList<ClientHandler> getGameMasters(){
         for(int i=0; i<loggedInPlayers.size(); i++){
             if(loggedInPlayers.get(i).isGameMaster()){
@@ -49,7 +44,6 @@ public class Server {
         }
         return masters;
     }
-
     public static boolean checkUniqueness(String name){
         ArrayList<ClientHandler> temp = masters;
         for(ClientHandler client : temp){
@@ -61,6 +55,9 @@ public class Server {
 
     public static void sendMsg(ClientHandler client2, String msg){
         client2.sendMessage(msg);
+    }
+    public static ArrayList<ClientHandler> getLoggedInPlayers() {
+        return loggedInPlayers;
     }
 }
 

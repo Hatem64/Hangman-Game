@@ -55,7 +55,6 @@ public class SinglePlayer {
     public void selectGameDifficulty(){
         try {
             while (true){
-                String[] returnedMsg = null;
                 serverMsg = "1,Please select a game difficulty " + userArr[0] + "\n 1-Easy \n 2-Hard \n 3-Show Score History \n 4-Exit";
                 dataOutputStream.writeUTF(serverMsg);
                 dataOutputStream.flush();

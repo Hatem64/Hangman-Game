@@ -9,7 +9,6 @@ public class ClientHandler implements Runnable{
 
     private Socket client;
     private Scanner scanner = null;
-//    String clientMsg = "";
     String functionMsg = "";
     String functionMsg2 = "";
 
@@ -23,12 +22,9 @@ public class ClientHandler implements Runnable{
     String teamOption = "";
 
     ClientHandler player;
-    String teamName;
     String modeOption;
     Boolean isGameMaster = false;
     String gameRoomName = "";
-
-//    private Team team;
     Team team1;
     Team team2;
 
@@ -49,11 +45,6 @@ public class ClientHandler implements Runnable{
     public Socket getClient() {
         return client;
     }
-
-    public DataOutputStream getDataOutputStream() {
-        return dataOutputStream;
-    }
-
     public DataInputStream getDataInputStream() {
         return dataInputStream;
     }
@@ -66,9 +57,6 @@ public class ClientHandler implements Runnable{
             if (functionMsg.equals("2")){
                 functionMsg2 = gameMenu();
             }
-//            if (functionMsg2.equals("2")){
-//
-//            }
             dataOutputStream.close();
             scanner.close();
         } catch (IOException e) {
@@ -110,16 +98,14 @@ public class ClientHandler implements Runnable{
                             dataOutputStream.writeUTF(serverMsg);
                             dataOutputStream.flush();
                             clientMsgs.add((String) dataInputStream.readUTF());
-//                            System.out.println("Client: " + clientMsg);
                         }
                         serverMsg = impUserServices.register(clientMsgs.get(0),clientMsgs.get(1),clientMsgs.get(2));
                         dataOutputStream.writeUTF(serverMsg);
                         dataOutputStream.flush();
                         break;
                     case "3":
-                        return "exit";
+                        System.exit(0);
                 }
-
             }
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -130,7 +116,6 @@ public class ClientHandler implements Runnable{
         try {
             while (true){
                 ArrayList<String> clientMsgs = new ArrayList<>();
-                String[] returnedMsg = null;
                 serverMsg = "1,Select one of following options! \n 1-Single Player \n 2-Multiplayer \n 3-Show Score History \n 4-Exit";
                 sendMessage(serverMsg);
                 selected = readMessage();
@@ -142,7 +127,6 @@ public class ClientHandler implements Runnable{
                         break;
                     case "2":
                         multiplayer=new Multiplayer(this);
-//                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
                         while (true){
                             sendMessage("1,Select one of the following options! \n 1-Create a game room \n 2-Join an existing game \n 3-back");
                             teamOption=readMessage();
@@ -171,6 +155,7 @@ public class ClientHandler implements Runnable{
                                         //multiplayer.startGame(team1,team2,"1")
                                             break;
                                         case "2":
+                                            //    2 v 2
                                             break;
                                         default:
                                             sendMessage("3,Invalid option.");
@@ -211,7 +196,8 @@ public class ClientHandler implements Runnable{
                         dataOutputStream.flush();
                         break;
                     case "4":
-                        return "exit";
+                        //Exit Case
+                        return registrationAndLoginMenu();
                     default:
                         sendMessage("3,Please enter one of the options!");
                 }
@@ -223,6 +209,8 @@ public class ClientHandler implements Runnable{
             throw new RuntimeException(e);
         }
     }
+
+
     public void sendMessage(String message) {
         try {
             DataOutputStream outputStream = new DataOutputStream(client.getOutputStream());
@@ -232,7 +220,6 @@ public class ClientHandler implements Runnable{
             e.printStackTrace();
         }
     }
-
     public String readMessage() throws IOException {
         String message = null;
         if (dataInputStream != null) {
