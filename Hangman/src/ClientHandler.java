@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable{
     SinglePlayer singlePlayer;
     Multiplayer multiplayer;
     String selected = "";
+    String teamOption = "";
 
     ClientHandler player;
     String teamName;
@@ -28,8 +29,8 @@ public class ClientHandler implements Runnable{
     String gameRoomName = "";
 
 //    private Team team;
-    Team team1=new Team("Team 1");
-    Team team2=new Team("Team 2");
+    Team team1;
+    Team team2;
 
 
     public ClientHandler(Socket socket) {
@@ -144,55 +145,58 @@ public class ClientHandler implements Runnable{
 //                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
                         while (true){
                             sendMessage("1,Select one of the following options! \n 1-Create a game room \n 2-Join an existing game \n 3-back");
-                            String teamOption=readMessage();
-                            if(teamOption=="1")
-                            {
-                                isGameMaster = true;
-                                sendMessage("1,Enter name of the game room! ;)");
-                                gameRoomName=readMessage();
-                                if(Server.checkUniqueness(gameRoomName)){
-                                    sendMessage("3,The name you entered already exists, please enter another game");
-                                    continue;
-                                }
-                                setTeam(1);
+                            teamOption=readMessage();
+                            switch (teamOption){
+                                case "1":
+                                    isGameMaster = true;
+                                    sendMessage("1,Enter name of the game room! ;)");
+                                    gameRoomName=readMessage();
+                                    if(!Server.checkUniqueness(gameRoomName)){
+                                        sendMessage("3,The name you entered already exists please enter another game");
+                                        continue;
+                                    }
+                                    team1 = new Team("Team 1");
+                                    team2 = new Team("Team 2");
+                                    setTeam(1);
 //                                multiplayer.createTeam(teamName,this);
-                                sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
-                                modeOption=readMessage();
-                                if(modeOption=="1"){
-                                    multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
-                                    multiplayer.gameMenu();
-                                    return "2";
-                                    //They should play 1v1
+                                    sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
+                                    modeOption=readMessage();
+                                    switch (modeOption){
+                                        case "1":
+                                            multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
+                                            multiplayer.gameMenu();
+//                                            return "2";
+                                        //They should play 1v1
 //                                    Server.add();
-                                    //multiplayer.startGame(team1,team2,"1")
-                                } else if (modeOption=="2") {
-
-
-                                }
-                                //Two teams should be created
-                            }
-                            else if (teamOption=="2") {
-                                ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
-                                for (int i = 0; i< gameMasters.size(); i++){
-                                    sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
-                                }
-                                sendMessage("1, select one of the above rooms to join!");
-                                selected = readMessage();
-                                if(Integer.parseInt(selected) > gameMasters.size()) {
-                                    sendMessage("3,Please choose one of the rooms!!");
-                                    continue;
-                                }
-                                gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinTeam(this);
-                            }
-                            else if (teamOption=="3") {
-                                break;
-                            }
-                            else {
-                                sendMessage("3,Invalid option.");
-                                break;
+                                        //multiplayer.startGame(team1,team2,"1")
+                                            break;
+                                        case "2":
+                                            break;
+                                        default:
+                                            sendMessage("3,Invalid option.");
+                                    }
+//                                    break;
+                                case "2":
+                                    multiplayer=new Multiplayer(this);
+                                    ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
+                                    for (int i = 0; i< gameMasters.size(); i++){
+                                        sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
+                                    }
+                                    sendMessage("1, select one of the above rooms to join!");
+                                    selected = readMessage();
+                                    if(Integer.parseInt(selected) > gameMasters.size()) {
+                                        sendMessage("3,Please choose one of the rooms!!");
+                                        continue;
+                                    }
+                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinGame(this, multiplayer);
+                                    break;
+                                case "3":
+                                    break;
+                                default:
+                                    sendMessage("3,Invalid option.");
                             }
                         }
-                        break;
+//                        break;
                     case "3":
                         //show the score history of this player
                         for(int i =0; i<3; i++){
@@ -214,6 +218,8 @@ public class ClientHandler implements Runnable{
 
             }
         }catch (IOException e){
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

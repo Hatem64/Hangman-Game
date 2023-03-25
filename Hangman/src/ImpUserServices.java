@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -7,7 +8,11 @@ public class ImpUserServices implements UserServices{
     private String name;
     private String userName;
     private String password;
-    private List<Integer> scores;
+    private ArrayList<String> scoresArr = new ArrayList<>();
+
+    private String scores = "";
+
+    String fileLine = "";
 
     private Socket clientSocket;
     private BufferedReader in;
@@ -22,22 +27,22 @@ public class ImpUserServices implements UserServices{
         this.clientSocket = clientSocket;
     }
 
-    public ImpUserServices(String name, String userName, String password, List<Integer> scores, Socket clientSocket) {
-        this.name = name;
-        this.userName = userName;
-        this.password = password;
-        this.scores = scores;
-        this.isLoggedIn = false;
-        this.clientSocket = clientSocket;
+//    public ImpUserServices(String name, String userName, String password, List<Integer> scoresArr, Socket clientSocket) {
+//        this.name = name;
+//        this.userName = userName;
+//        this.password = password;
+//        this.scoresArr = scoresArr;
+//        this.isLoggedIn = false;
+//        this.clientSocket = clientSocket;
+//
+//    }
 
+    public ArrayList<String> getScoresArr() {
+        return scoresArr;
     }
 
-    public List<Integer> getScores() {
-        return scores;
-    }
-
-    public void setScores(List<Integer> scores) {
-        this.scores = scores;
+    public void setScoresArr(ArrayList<String> scoresArr) {
+        this.scoresArr = scoresArr;
     }
 
     public String getName() {
@@ -114,8 +119,8 @@ public class ImpUserServices implements UserServices{
             }
 
             while(reader.hasNextLine()){
-                String line = reader.nextLine();
-                user = line.split(",");
+                fileLine = reader.nextLine();
+                user = fileLine.split(",");
                 setUserName(userName);
                 setPassword(password);
                 if(Server.checkLogged(userName))
@@ -146,6 +151,12 @@ public class ImpUserServices implements UserServices{
                     return "3,401 unauthorized access!";
                 }else {
                     isLoggedIn = true;
+                    if(user.length > 3) {
+                        for(int i = 3; i< user.length; i++){
+                            scoresArr.add(user[i]);
+                            scores = scores.concat(user[i]+",");
+                        }
+                    }
                     String str = "2,Welcome " + user[0];
                     return str;
                 }
@@ -155,13 +166,13 @@ public class ImpUserServices implements UserServices{
         return isLoggedIn;
     }
 
-    public void sendMessage(String message) {
-        try {
-            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
-            outputStream.writeUTF(message);
-            outputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void sendMessage(String message) {
+//        try {
+//            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+//            outputStream.writeUTF(message);
+//            outputStream.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
