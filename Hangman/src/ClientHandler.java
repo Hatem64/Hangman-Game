@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable{
     SinglePlayer singlePlayer;
     Multiplayer multiplayer;
     String selected = "";
+    String teamOption = "";
 
     ClientHandler player;
     String teamName;
@@ -28,8 +29,8 @@ public class ClientHandler implements Runnable{
     String gameRoomName = "";
 
 //    private Team team;
-    Team team1=new Team("Team 1");
-    Team team2=new Team("Team 2");
+    Team team1;
+    Team team2;
 
 
     public ClientHandler(Socket socket) {
@@ -144,66 +145,58 @@ public class ClientHandler implements Runnable{
 //                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
                         while (true){
                             sendMessage("1,Select one of the following options! \n 1-Create a game room \n 2-Join an existing game \n 3-back");
-                            String teamOption=readMessage();
-                            if(teamOption=="1")
-                            {
-                                isGameMaster = true;
-                                sendMessage("1,Enter name of the game room! ;)");
-                                gameRoomName=readMessage();
-                                if(Server.checkUniqueness(gameRoomName)){
-                                    sendMessage("3,The name you entered already exists, please enter another game");
-                                    continue;
-                                }
-                                setTeam(1);
+                            teamOption=readMessage();
+                            switch (teamOption){
+                                case "1":
+                                    isGameMaster = true;
+                                    sendMessage("1,Enter name of the game room! ;)");
+                                    gameRoomName=readMessage();
+                                    if(!Server.checkUniqueness(gameRoomName)){
+                                        sendMessage("3,The name you entered already exists please enter another game");
+                                        continue;
+                                    }
+                                    team1 = new Team("Team 1");
+                                    team2 = new Team("Team 2");
+                                    setTeam(1);
 //                                multiplayer.createTeam(teamName,this);
-                                sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
-                                modeOption=readMessage();
-                                if(modeOption=="1"){
-                                    multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
-                                    multiplayer.gameMenu();
-                                    return "2";
-                                    //They should play 1v1
+                                    sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
+                                    modeOption=readMessage();
+                                    switch (modeOption){
+                                        case "1":
+                                            multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
+                                            multiplayer.gameMenu();
+//                                            return "2";
+                                        //They should play 1v1
 //                                    Server.add();
-                                    //multiplayer.startGame(team1,team2,"1")
-                                } else if (modeOption=="2") {
-
-                                    //I want to make a function to just make the game, and that function will keep checking on the number of players and
-                                    //and inside it is the startgame method.
-
-                                    //the set team method in the two modes are going to be different, for example, in mode 1,
-                                    //the other player will be autmatically be added to the other team
-                                    //but in mode 2, we have several cases, case 1; both teams has empty space in it (such as 1 player in each team,
-                                    //or the other team is empty.
-                                    //case 2; one of the teams is full, so the player will automatically join the empty team, whether it
-                                    //has no players or 1 player.
-
-//                                    multiplayer.startGame(team1, team2, 1);
-                                    // 2 teams 4 players
-                                    // 2v2
-                                }
-                                //Two teams should be created
-                            }
-                            else if (teamOption=="2") {
-                                //list game rooms, and then check the mode, if 1v1, then automatically go to team 2, if 2v2, and
-                                //the both teams has space, then select which team to enter, if one team is full, then
-                                //automatically go to the other team
-                                ArrayList<ClientHandler> currentGameMasters = Server.getGameMasters();
-                                for(int i = 0; i<currentGameMasters.size(); i++){
-                                    sendMessage("3,Room " + (i+1) +": "+ currentGameMasters.get(i).getGameRoomName());
-                                }
-                                sendMessage("1,Select one of the above rooms to join!");
-                                selected = readMessage();
-//                                sendMessage("1, ");
-                            }
-                            else if (teamOption=="3") {
-                                break;
-                            }
-                            else {
-                                sendMessage("3,Invalid option.");
-                                break;
+                                        //multiplayer.startGame(team1,team2,"1")
+                                            break;
+                                        case "2":
+                                            break;
+                                        default:
+                                            sendMessage("3,Invalid option.");
+                                    }
+//                                    break;
+                                case "2":
+                                    multiplayer=new Multiplayer(this);
+                                    ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
+                                    for (int i = 0; i< gameMasters.size(); i++){
+                                        sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
+                                    }
+                                    sendMessage("1, select one of the above rooms to join!");
+                                    selected = readMessage();
+                                    if(Integer.parseInt(selected) > gameMasters.size()) {
+                                        sendMessage("3,Please choose one of the rooms!!");
+                                        continue;
+                                    }
+                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinGame(this, multiplayer);
+                                    break;
+                                case "3":
+                                    break;
+                                default:
+                                    sendMessage("3,Invalid option.");
                             }
                         }
-                        break;
+//                        break;
                     case "3":
                         //show the score history of this player
                         for(int i =0; i<3; i++){
@@ -225,6 +218,8 @@ public class ClientHandler implements Runnable{
 
             }
         }catch (IOException e){
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

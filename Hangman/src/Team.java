@@ -8,7 +8,7 @@ public class Team {
 
     private String name;
     int numAttempts=4;
-    int score = 0;
+    int score=0;
     private List<ClientHandler> players = new ArrayList<>();
 
     public Team(String name) {

@@ -58,6 +58,10 @@ public class Server {
         }
         return true;
     }
+
+    public static void sendMsg(ClientHandler client2, String msg){
+        client2.sendMessage(msg);
+    }
 }
 
 

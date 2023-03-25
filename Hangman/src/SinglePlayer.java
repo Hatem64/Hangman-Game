@@ -149,7 +149,7 @@ public class SinglePlayer {
     }
 
 
-    public void addScoreToUser(String Score){
+    public void addScoreToUser(String score){
         try( BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
             int lineNum = 0;
