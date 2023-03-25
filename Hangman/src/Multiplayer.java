@@ -28,13 +28,9 @@ public class Multiplayer {
     // Map of all teams
     private final Map<String, Team> teams = new HashMap<>();
 
-//    ArrayList<Team> gameRoom = new ArrayList<>();
-//    Team team1 = new Team();
-//    Team team2 = new Team();
 
     public Multiplayer(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-//        List<ImpUserServices> players = loadLoggedInPlayers("RegisteredUsers.txt");
         // Add all players to waiting list
 //        waitingPlayers.addAll(players);
     }
@@ -46,8 +42,6 @@ public class Multiplayer {
     public void gameMenu(){
         try {
             while (true){
-                ArrayList<String> clientMsgs = new ArrayList<>();
-                String[] returnedMsg = null;
                 serverMsg = "1,Please select one of the below options!! \n 1-Start Game \n 2-Reload game teams \n 3-Check players score history \n 4-Exit Program";
                 sendMessage(serverMsg);
                 selected = readMessage();
@@ -67,9 +61,7 @@ public class Multiplayer {
                         }
                         break;
                     case "3":
-                        
                 }
-
             }
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -139,16 +131,9 @@ public class Multiplayer {
                 team2.addPlayer(playerToJoin);
             }
         }
-
         multiplayer.gameMenuForJoinedPlayers();
     }
 
-
-
-    //Function to start a game between two teams
-    // The parameter mode will be used for selecting 1v1 / 2v2
-
-    //I think this should check the mode first, then decide whether the team count is equal or not.
     public void startGame() throws IOException {
         if (team1.getNumPlayers() != team2.getNumPlayers()) {
             for (ClientHandler player : team1.getPlayers()) {
@@ -158,19 +143,17 @@ public class Multiplayer {
                 player.sendMessage("3,Error: Number of players in both teams is not equal.");
             }
         } else {
+            //Is this done?
             gameStart = true;
+//            game(team1,);
             turnTracker(team1, team2);
         }
     }
 
 
-    public void playerWait() throws InterruptedException {
-        Thread.currentThread().wait();
-    }
 
-    public void playerNotify() throws InterruptedException {
-        Thread.currentThread().notify();
-    }
+
+
 
 
     public void turnTracker(Team team1, Team team2) throws IOException {
@@ -221,10 +204,8 @@ public class Multiplayer {
             addScoreToUser(currentTeam);
             addScoreToUser(opponentTeam);
     }
-
-
     public void game(Team team, ClientHandler player) throws IOException {
-        player.sendMessage("3,Be ware The server will only read the first character \nof the string if one is entered. \nso please enter a single character!");
+        player.sendMessage("3,Be ware The server will \n only read the first character \nof the string if one is entered. \nso please enter a single character!");
         boolean rightLetter = false;
         if(itertaion == 0){
             for(int i = 0; i<word.length(); i++){
@@ -245,14 +226,13 @@ public class Multiplayer {
                 }
             }
         }
-            if (rightLetter == false){
+            if (!rightLetter){
                 team.numAttempts--;
             }
     }
     public void addScoreToUser(Team team){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
-//            int lineNum = 0;
             BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
             Scanner reader;
             try {
@@ -279,7 +259,6 @@ public class Multiplayer {
         }
         try( BufferedWriter bw = new BufferedWriter(new FileWriter("RegisteredUsers.txt", false));)
         {
-//            int lineNum = 0;
             BufferedReader bf = new BufferedReader(new FileReader("Score.txt"));
             Scanner reader;
             try {
@@ -296,11 +275,6 @@ public class Multiplayer {
             throw new RuntimeException(e);
         }
     }
-
-    public void addTeamsToGameRoom(Team team1, Team team2){
-
-    }
-
     public void sendMessage(String message) {
         try {
             DataOutputStream outputStream = new DataOutputStream(clientHandler.getClient().getOutputStream());
@@ -310,7 +284,6 @@ public class Multiplayer {
             e.printStackTrace();
         }
     }
-
     public String readMessage() throws IOException {
         String message = null;
         if (clientHandler.getDataInputStream() != null) {
@@ -321,7 +294,13 @@ public class Multiplayer {
 
 
 
-
+    public void playerWait() throws InterruptedException {
+        Thread.currentThread().wait();
+    }
+    public void playerNotify() throws InterruptedException {
+        Thread.currentThread().notify();
+    }
+    public void addTeamsToGameRoom(Team team1, Team team2){}
 
 
 
