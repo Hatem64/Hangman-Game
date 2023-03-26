@@ -67,8 +67,11 @@ public class SinglePlayer {
                         game(6, "HardGame.txt");
                         break;
                     case "3":
-                        clientHandler.gameMenu();
 
+                        break;
+                    case "4":
+                        clientHandler.gameMenu();
+                        break;
                 }
 
             }

@@ -1,32 +1,24 @@
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Client{
     public static void main(String[] args) {
-        String score,numOfClients;
         String address="localhost";
         int port=6666;
         Socket socket = null;
         Scanner scanner = null;
-        String clientMsg = "";
-        String serverMsg = "";
+        String clientMsg = "",serverMsg = "";
         DataInputStream reader;
         DataInputStream input = null;
         String[] returnedMsg = null;
         boolean toChat = false;
-        //
         try {
             socket = new Socket(address, port);
             reader = new DataInputStream(socket.getInputStream());
             scanner = new Scanner(System.in);
 
             while(!clientMsg.equals("exit")){
-                //have a while loop here, that let's the client keep waiting for the boolean variable to be true, so it gets out
-                //and starts putting and taking input from server!!
-
-
                 serverMsg = (String) reader.readUTF();
                 returnedMsg = serverMsg.split(",");
                 if(!serverMsg.equals(""))
@@ -36,7 +28,6 @@ public class Client{
                     continue;
                 } if (returnedMsg[0].equals("4")){
                     toChat = false;
-//                    System.out.println("Server: " + returnedMsg[1]);
                     while (!toChat){
                         serverMsg = (String) reader.readUTF();
                         returnedMsg = serverMsg.split(",");
@@ -44,7 +35,6 @@ public class Client{
                             System.out.println("Server: " + returnedMsg[1]);
                             break;
                         }
-//                        System.out.println("Server: " + returnedMsg[1]);
                     }
                     continue;
                 }
@@ -71,7 +61,6 @@ public class Client{
             throw new RuntimeException(e);
         }
     }
-
     public static void close(Scanner scanner, Socket socket, DataInputStream reader) {
         try {
             scanner.close();
@@ -81,5 +70,4 @@ public class Client{
             e.printStackTrace();
         }
     }
-
 }

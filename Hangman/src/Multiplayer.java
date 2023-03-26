@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.util.*;
 
@@ -21,7 +19,6 @@ public class Multiplayer {
     String word = "";
     String dashes = "";
     int itertaion=0;
-    int infinite = 0;
 
     boolean gameStart = false;
     ArrayList<ClientHandler> players = new ArrayList<>();
@@ -36,8 +33,6 @@ public class Multiplayer {
 
     public Multiplayer(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-        // Add all players to waiting list
-//        waitingPlayers.addAll(players);
         players.add(clientHandler);
     }
 
@@ -154,7 +149,6 @@ public class Multiplayer {
                     player.sendMessage("3,Error: Number of players in both teams is not equal.");
                 }
             } else {
-//                gameStart = true;
                 clientHandler.playerTurn = true;
                 gameSequencer(team1, team2);
             }
@@ -176,9 +170,8 @@ public class Multiplayer {
         }
     }
 
-    public void gameSequencer(@NotNull Team team1, Team team2) throws IOException {
+    public void gameSequencer(Team team1, Team team2) throws IOException {
         int currentPlayerIndex=0;
-        int opponentPlayerIndex=0;
         Team currentTeam = team1;
         Team opponentTeam = team2;
 
@@ -187,9 +180,10 @@ public class Multiplayer {
             currentPlayer.playerTurn = true;
 
 
+            currentPlayer.sendMessage("3,Your turn");
             currentPlayer.sendMessage("5,Enter one character please!");
             boolean rightLetter = false;
-            currentPlayer.sendMessage("3,Your turn");
+
             if(itertaion == 0){
                 for(int i = 0; i<word.length(); i++){
                     dashes = dashes.concat("_");
@@ -208,8 +202,15 @@ public class Multiplayer {
                     rightLetter = true;
                 }
             }
-            if (rightLetter == false){
+            if (!rightLetter){
                 currentTeam.numAttempts--;
+                if (currentTeam == team1) {
+                    currentTeam = team2;
+                    opponentTeam = team1;
+                } else {
+                    currentTeam = team1;
+                    opponentTeam = team2;
+                }
             }else {
                 for(ClientHandler player:players){
                     if(!player.playerTurn){
@@ -225,21 +226,15 @@ public class Multiplayer {
                     player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
                 }
                 for (ClientHandler player : opponentTeam.getPlayers()) {
-                    player.sendMessage("3,Better luck next time\nScore: "+ currentTeam.score);
+                    player.sendMessage("3,Better luck next time\nScore: "+ opponentTeam.score);
                 }
                 for(int i = 1; i<players.size(); i++){
                     Server.createNewThread(players.get(i));
                 }
                 break;
             }
-            if (currentTeam == team1) {
-                currentTeam = team2;
-                opponentTeam = team1;
-            } else {
-                currentTeam = team1;
-                opponentTeam = team2;
-            }
             currentPlayer.playerTurn = false;
+
             for (int i = 0; i < players.size(); i++){
                 if(i == players.size()-1){
                     if(players.get(i) == currentPlayer){
@@ -334,17 +329,6 @@ public class Multiplayer {
         }
         return message;
     }
-
-
-
-    public void playerWait() throws InterruptedException {
-        Thread.currentThread().wait();
-    }
-    public void playerNotify() throws InterruptedException {
-        Thread.currentThread().notify();
-    }
-    public void addTeamsToGameRoom(Team team1, Team team2){}
-
 
 
 }
