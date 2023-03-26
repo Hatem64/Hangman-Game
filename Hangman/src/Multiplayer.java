@@ -205,6 +205,26 @@ public class Multiplayer {
             currentPlayer.sendMessage("3,\nScore of "+currentTeam.getTeamName()+" is: "+ currentTeam.score +"\nNumber of attempts: "+ currentTeam.numAttempts +"\nThe word: ");
             currentPlayer.sendMessage("1," + dashes);
             clientMsg=currentPlayer.readMessage();
+
+            if (clientMsg.equals("-")){
+                //for loop to track all players and tell them they won
+                gameStart = false;
+                for (ClientHandler player : currentTeam.getPlayers()) {
+                    player.sendMessage("3,Damn I think one of the players got no guts. \nHis ancestors should feel ashamed for having such a disgrace of a human being");
+                    player.sendMessage("3,The word was: "+word);
+
+                }
+                for (ClientHandler player : opponentTeam.getPlayers()) {
+                    player.sendMessage("3,Damn I think one of the players got no guts. \nHis ancestors should feel ashamed for having such a disgrace of a human being");
+                    player.sendMessage("3,The word was: "+word);
+
+                }
+                for(int i = 1; i<players.size(); i++){
+                    Server.createNewThread(players.get(i));
+                }
+                gameMenu();
+            }
+
             for(int i = 0; i<word.length(); i++){
                 clientMsg = clientMsg.toLowerCase();
                 if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
@@ -229,6 +249,8 @@ public class Multiplayer {
                 for(ClientHandler player:players){
                     if(!player.playerTurn){
                         player.sendMessage("4,"+currentPlayer.getImpUserServices().getName()+" Has guessed the right letter");
+                        player.sendMessage("4," + dashes);
+
                     }
                 }
             }
@@ -247,6 +269,7 @@ public class Multiplayer {
                 }
                 break;
             }
+
             currentPlayer.playerTurn = false;
 
             for (int i = 0; i < players.size(); i++){
