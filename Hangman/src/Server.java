@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Server {
     private static volatile ArrayList<ClientHandler> loggedInPlayers = new ArrayList<>();
-    private static volatile ArrayList<ClientHandler> masters = new ArrayList<>();
+    private static ArrayList<ClientHandler> masters = new ArrayList<>();
 
     public static void main(String[] args) {
         try{
@@ -42,6 +42,17 @@ public class Server {
         }
         return masters;
     }
+
+    public static void reloadGameMasters(){
+        for(int i=0; i<loggedInPlayers.size(); i++){
+            if(loggedInPlayers.get(i).isGameMaster()){
+                if (!masters.contains(loggedInPlayers.get(i))){
+                    masters.add(loggedInPlayers.get(i));
+                }
+            }
+        }
+    }
+
     public static boolean checkUniqueness(String name){
         ArrayList<ClientHandler> temp = masters;
         for(ClientHandler client : temp){

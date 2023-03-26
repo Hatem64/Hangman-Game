@@ -138,10 +138,12 @@ public class ImpUserServices implements UserServices{
                     return "3,401 unauthorized access!";
                 }else {
                     isLoggedIn = true;
-                    if(user.length > 3) {
-                        for(int i = 3; i< user.length; i++){
-                            scoresArr.add(user[i]);
-                            scores = scores.concat(user[i]+",");
+                    if (user.length > 3){
+                        for(int i = 3; i<user.length; i++){
+                            if((i+1) == user.length){
+                                scores = scores.concat(user[i]);
+                            }else
+                                scores = scores.concat(user[i]+"-");
                         }
                     }
                     String str = "2,Welcome " + user[0];
@@ -153,7 +155,11 @@ public class ImpUserServices implements UserServices{
         return isLoggedIn;
     }
 
-//    public void sendMessage(String message) {
+    public String getScores() {
+        return scores;
+    }
+
+    //    public void sendMessage(String message) {
 //        try {
 //            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
 //            outputStream.writeUTF(message);

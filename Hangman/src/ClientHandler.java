@@ -175,7 +175,7 @@ public class ClientHandler implements Runnable{
                         break;
                     case "2":
                         multiplayer=new Multiplayer(this);
-//                        multiplayer.loadLoggedInPlayers("RegisteredUsers.txt");
+                        Server.reloadGameMasters();
                         while (true){
                             sendMessage("1,Select one of the following options! \n 1-Create a game room \n 2-Join an existing game \n 3-back");
                             teamOption=readMessage();
@@ -184,10 +184,12 @@ public class ClientHandler implements Runnable{
                                     isGameMaster = true;
                                     sendMessage("1,Enter name of the game room! ;)");
                                     gameRoomName=readMessage();
-//                                    if(!Server.checkUniqueness(gameRoomName)){
-//                                        sendMessage("3,The name you entered already exists please enter another game");
-//                                        continue;
-//                                    }
+                                    if(gameRoomName.equals("-"))
+                                        continue;
+                                    if(!Server.checkUniqueness(gameRoomName)){
+                                        sendMessage("3,The name you entered already exists please enter another game");
+                                        continue;
+                                    }
                                     team1 = new Team("Team 1");
                                     team2 = new Team("Team 2");
                                     setTeam(1);
@@ -197,10 +199,7 @@ public class ClientHandler implements Runnable{
                                         case "1":
                                             multiplayer.createGameRoom(team1, team2, gameRoomName, 1);
                                             multiplayer.gameMenu();
-//                                            return "2";
-                                        //They should play 1v1
-//                                    Server.add();
-                                        //multiplayer.startGame(team1,team2,"1")
+
                                             break;
                                         case "2":
                                             multiplayer.createGameRoom(team1, team2, gameRoomName, 2);
@@ -231,17 +230,8 @@ public class ClientHandler implements Runnable{
                             }
                         }
                     case "3":
-                        //show the score history of this player
-                        for(int i =0; i<3; i++){
-                            serverMsg = "";
-                            dataOutputStream.writeUTF(serverMsg);
-                            dataOutputStream.flush();
-                            clientMsgs.add((String) dataInputStream.readUTF());
-//                            System.out.println("Client: " + clientMsg);
-                        }
-                        serverMsg = impUserServices.register(clientMsgs.get(0),clientMsgs.get(1),clientMsgs.get(2));
-                        dataOutputStream.writeUTF(serverMsg);
-                        dataOutputStream.flush();
+                        sendMessage("3,The scores of the previous games: ");
+                        sendMessage("3,"+getImpUserServices().getScores());
                         break;
                     case "4":
                         return "exit";

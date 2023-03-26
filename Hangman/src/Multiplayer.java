@@ -62,7 +62,16 @@ public class Multiplayer {
                         }
                         break;
                     case "3":
-
+                        sendMessage("3,Team 1 scores: ");
+                        for (ClientHandler player : team1.getPlayers()) {
+                            sendMessage("3,"+player.getImpUserServices().getName()+":");
+                            sendMessage("3,"+player.getImpUserServices().getScores());
+                        }
+                        sendMessage("3,Team 2 scores: ");
+                        for (ClientHandler player : team2.getPlayers()) {
+                            sendMessage("3,"+player.getImpUserServices().getName()+":");
+                            sendMessage("3,"+player.getImpUserServices().getScores());
+                        }
                         break;
                     case "4":
                         clientHandler.gameMenu();
@@ -108,8 +117,10 @@ public class Multiplayer {
         if(mode == 1){
             if(team2.getNumPlayers() != 1)
                 team2.addPlayer(playerToJoin);
-            else
+            else{
                 playerToJoin.sendMessage("3,Game room is full, please try to join another room!");
+                playerToJoin.gameMenu();
+            }
         }else {
             if(team1.getNumPlayers() < 3 && team2.getNumPlayers() < 3){
                 if(num % 2 == 0){
@@ -126,8 +137,10 @@ public class Multiplayer {
                     }
                 }
                 num++;
-            }else
+            }else{
                 playerToJoin.sendMessage("3,Game room is full, please try to join another room!");
+                playerToJoin.gameMenu();
+            }
         }
 
         players.add(playerToJoin);
@@ -204,6 +217,7 @@ public class Multiplayer {
             }
             if (!rightLetter){
                 currentTeam.numAttempts--;
+                currentPlayer.sendMessage("3,Ah sad wrong letter..");
                 if (currentTeam == team1) {
                     currentTeam = team2;
                     opponentTeam = team1;
@@ -226,7 +240,7 @@ public class Multiplayer {
                     player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
                 }
                 for (ClientHandler player : opponentTeam.getPlayers()) {
-                    player.sendMessage("3,Better luck next time\nScore: "+ opponentTeam.score);
+                    player.sendMessage("3,Better luck next time... \nThe word was: "+word+"\nScore: "+ opponentTeam.score);
                 }
                 for(int i = 1; i<players.size(); i++){
                     Server.createNewThread(players.get(i));
