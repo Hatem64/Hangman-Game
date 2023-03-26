@@ -40,7 +40,7 @@ public class Client{
                     while (!toChat){
                         serverMsg = (String) reader.readUTF();
                         returnedMsg = serverMsg.split(",");
-                        if(returnedMsg[0].equals("5")){
+                        if(returnedMsg[0].equals("5") || returnedMsg[0].equals("3")){
                             System.out.println("Server: " + returnedMsg[1]);
                             break;
                         }
