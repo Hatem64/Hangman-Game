@@ -3,28 +3,23 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class Server {
-    static final ArrayList<ClientHandler> clientsList = new ArrayList<>();
     private static volatile ArrayList<ClientHandler> loggedInPlayers = new ArrayList<>();
     private static volatile ArrayList<ClientHandler> masters = new ArrayList<>();
-    //
 
     public static void main(String[] args) {
         try{
             ServerSocket serverSocket = new ServerSocket(6666);
             while (true){
                 Socket client = serverSocket.accept();
-                ImpUserServices impUserServices= new ImpUserServices(client);
                 System.out.println("New client connected " + client.getInetAddress().getHostAddress());
                 ClientHandler clientHandler = new ClientHandler(client);
                 addPlayer(clientHandler);
                 new Thread(clientHandler).start();
-                //list ->
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
-
     public static void addPlayer(ClientHandler player){
         loggedInPlayers.add(player);
     }
