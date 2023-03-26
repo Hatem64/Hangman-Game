@@ -170,7 +170,7 @@ public class ClientHandler implements Runnable{
                 System.out.println("Client: " + selected);
                 switch (selected){
                     case "1":
-                        singlePlayer = new SinglePlayer(clientMsgs.get(0), client);
+                        singlePlayer = new SinglePlayer(clientMsgs.get(0), this);
                         singlePlayer.selectGameDifficulty();
                         break;
                     case "2":

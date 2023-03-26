@@ -24,7 +24,7 @@ public class SinglePlayer {
     Socket client = null;
     int score = 0;
 
-    public SinglePlayer(String userString, Socket client) throws IOException {
+    public SinglePlayer(String userString, ClientHandler clientHandler) throws IOException {
         this.userString = userString;
         try {
             BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
@@ -42,10 +42,10 @@ public class SinglePlayer {
                     break;
                 }
             }
-            this.client = client;
-            clientHandler = new ClientHandler(client);
-            dataOutputStream = new DataOutputStream(client.getOutputStream());
-            dataInputStream = new DataInputStream(client.getInputStream());
+//            this.client = client;
+            this.clientHandler = clientHandler;
+            dataOutputStream = new DataOutputStream(clientHandler.getClient().getOutputStream());
+            dataInputStream = new DataInputStream(clientHandler.getClient().getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +67,8 @@ public class SinglePlayer {
                         game(6, "HardGame.txt");
                         break;
                     case "3":
-
+                        clientHandler.sendMessage("3,The scores of the previous games: ");
+                        clientHandler.sendMessage("3,"+clientHandler.getImpUserServices().getScores());
                         break;
                     case "4":
                         clientHandler.gameMenu();
