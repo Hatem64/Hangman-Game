@@ -211,6 +211,10 @@ public class ClientHandler implements Runnable{
                                     break;
                                 case "2":
                                     ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
+                                    if(gameMasters.size() == 0){
+                                        sendMessage("3,Sorry there's no available rooms atm. \nPlease wait for a game master to create one!");
+                                        continue;
+                                    }
                                     for (int i = 0; i< gameMasters.size(); i++){
                                         sendMessage("3,Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
                                     }
