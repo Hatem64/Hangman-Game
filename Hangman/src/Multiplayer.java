@@ -33,13 +33,9 @@ public class Multiplayer {
     // Map of all teams
     private final Map<String, Team> teams = new HashMap<>();
 
-//    ArrayList<Team> gameRoom = new ArrayList<>();
-//    Team team1 = new Team();
-//    Team team2 = new Team();
 
     public Multiplayer(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-//        List<ImpUserServices> players = loadLoggedInPlayers("RegisteredUsers.txt");
         // Add all players to waiting list
 //        waitingPlayers.addAll(players);
         players.add(clientHandler);
@@ -52,8 +48,6 @@ public class Multiplayer {
     public void gameMenu(){
         try {
             while (true){
-                ArrayList<String> clientMsgs = new ArrayList<>();
-                String[] returnedMsg = null;
                 serverMsg = "1,Please select one of the below options!! \n 1-Start Game \n 2-Reload game teams \n 3-Check players score history \n 4-Exit Program";
                 sendMessage(serverMsg);
                 selected = readMessage();
@@ -73,12 +67,12 @@ public class Multiplayer {
                         }
                         break;
                     case "3":
+
                         break;
                     case "4":
                         clientHandler.gameMenu();
-                        
-                }
 
+                }
             }
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -140,12 +134,14 @@ public class Multiplayer {
             }else
                 playerToJoin.sendMessage("3,Game room is full, please try to join another room!");
         }
+
         players.add(playerToJoin);
         ArrayList<ClientHandler> playerss = new ArrayList<>();
         for(int i=1; i<players.size();i++){
             playerss.add(players.get(i));
         }
         gameLoop(playerss);
+
     }
 
     public void startGame() throws IOException {
@@ -280,12 +276,9 @@ public class Multiplayer {
         addScoreToUser(opponentTeam);
         gameMenu();
     }
-
-
     public void addScoreToUser(Team team){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
-//            int lineNum = 0;
             BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
             Scanner reader;
             try {
@@ -312,7 +305,6 @@ public class Multiplayer {
         }
         try( BufferedWriter bw = new BufferedWriter(new FileWriter("RegisteredUsers.txt", false));)
         {
-//            int lineNum = 0;
             BufferedReader bf = new BufferedReader(new FileReader("Score.txt"));
             Scanner reader;
             try {
@@ -329,11 +321,6 @@ public class Multiplayer {
             throw new RuntimeException(e);
         }
     }
-
-    public void addTeamsToGameRoom(Team team1, Team team2){
-
-    }
-
     public void sendMessage(String message) {
         try {
             DataOutputStream outputStream = new DataOutputStream(clientHandler.getClient().getOutputStream());
@@ -343,7 +330,6 @@ public class Multiplayer {
             e.printStackTrace();
         }
     }
-
     public String readMessage() throws IOException {
         String message = null;
         if (clientHandler.getDataInputStream() != null) {
@@ -354,7 +340,13 @@ public class Multiplayer {
 
 
 
-
+    public void playerWait() throws InterruptedException {
+        Thread.currentThread().wait();
+    }
+    public void playerNotify() throws InterruptedException {
+        Thread.currentThread().notify();
+    }
+    public void addTeamsToGameRoom(Team team1, Team team2){}
 
 
 
