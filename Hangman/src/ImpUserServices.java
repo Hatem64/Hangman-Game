@@ -15,10 +15,6 @@ public class ImpUserServices implements UserServices{
     String fileLine = "";
 
     private Socket clientSocket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private String word;
-    private String guess;
 
     private boolean isLoggedIn;
 

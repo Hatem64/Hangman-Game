@@ -128,7 +128,7 @@ public class SinglePlayer {
                 dataOutputStream.flush();
                 break;
             }
-            else if (score == word.length()){
+            else if (!dashes.contains("_")){
                 serverMsg = "3,Well Done!!!\nScore: "+ score ;
                 String num = Integer.toString(score);
                 addScoreToUser(num);
@@ -145,6 +145,12 @@ public class SinglePlayer {
             dataOutputStream.writeUTF("1,"+dashes);
             dataOutputStream.flush();
             clientMsg = ((String) dataInputStream.readUTF());
+            if(clientMsg.equals("-")){
+                serverMsg = "3,You have quit the game. Too afraid of failure? Or too dumb to try...";
+                dataOutputStream.writeUTF(serverMsg);
+                dataOutputStream.flush();
+                break;
+            }
             iteration++;
         }
     }
