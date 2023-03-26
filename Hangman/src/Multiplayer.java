@@ -225,7 +225,7 @@ public class Multiplayer {
                     player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
                 }
                 for (ClientHandler player : opponentTeam.getPlayers()) {
-                    player.sendMessage("3,Better luck next time\nScore: "+ currentTeam.score);
+                    player.sendMessage("3,Better luck next time\nScore: "+ opponentTeam.score);
                 }
                 for(int i = 1; i<players.size(); i++){
                     Server.createNewThread(players.get(i));
@@ -268,12 +268,15 @@ public class Multiplayer {
                 player.sendMessage("3,You have failed! Shame on you... \nThe word was: "+ word +"\nBetter luck next time....");
             }
         }
-
-        addScoreToUser(currentTeam);
-        addScoreToUser(opponentTeam);
+        for (ClientHandler player : currentTeam.getPlayers()){
+            addScoreToUser(player, Integer.toString(currentTeam.score));
+        }
+        for (ClientHandler player : opponentTeam.getPlayers()){
+            addScoreToUser(player, Integer.toString(opponentTeam.score));
+        }
         gameMenu();
     }
-    public void addScoreToUser(Team team){
+    public void addScoreToUser(ClientHandler player, String score){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
             BufferedReader bf = new BufferedReader(new FileReader("RegisteredUsers.txt"));
@@ -284,19 +287,18 @@ public class Multiplayer {
                 throw new RuntimeException(e);
             }
 
-            for (ClientHandler player : team.getPlayers()) {
-                while (reader.hasNext()) {
-                    String line = reader.nextLine();
-                    if (line.contains(player.getImpUserServices().fileLine)) {
-                        bw.write(line + "," + team.score);
-                        bw.newLine();
-                        user = line + "," + team.score;
-                    }else{
-                        bw.write(line);
-                        bw.newLine();
-                    }
+
+            while (reader.hasNext()) {
+                String line = reader.nextLine();
+                if (line.contains(player.getImpUserServices().fileLine)) {
+                    bw.write(line + "," + score);
+                    bw.newLine();
+                }else {
+                    bw.write(line);
+                    bw.newLine();
                 }
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

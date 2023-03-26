@@ -191,7 +191,6 @@ public class ClientHandler implements Runnable{
                                     team1 = new Team("Team 1");
                                     team2 = new Team("Team 2");
                                     setTeam(1);
-//                                multiplayer.createTeam(teamName,this);
                                     sendMessage("1,Select one of the following \n 1- 1v1 \n 2- 2v2");
                                     modeOption=readMessage();
                                     switch (modeOption){
@@ -210,7 +209,7 @@ public class ClientHandler implements Runnable{
                                         default:
                                             sendMessage("3,Invalid option.");
                                     }
-//                                    break;
+                                    break;
                                 case "2":
                                     ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
                                     for (int i = 0; i< gameMasters.size(); i++){
@@ -225,15 +224,12 @@ public class ClientHandler implements Runnable{
                                     gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinGame(this);
                                     break;
                                 case "3":
-                                    break;
-                                case "4":
-                                    registrationAndLoginMenu();
+                                    gameMenu();
                                     break;
                                 default:
                                     sendMessage("3,Invalid option.");
                             }
                         }
-//                        break;
                     case "3":
                         //show the score history of this player
                         for(int i =0; i<3; i++){
