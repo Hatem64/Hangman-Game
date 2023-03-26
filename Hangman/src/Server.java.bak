@@ -60,6 +60,13 @@ public class Server {
         ClientHandler clientHandler = new ClientHandler(clientHandler2, 2);
         new Thread(clientHandler).start();
     }
+<<<<<<< HEAD
+
+=======
+    public static ArrayList<ClientHandler> getLoggedInPlayers() {
+        return loggedInPlayers;
+    }
+>>>>>>> main
 }
 
 

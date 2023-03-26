@@ -67,11 +67,13 @@ public class Multiplayer {
                         }
                         break;
                     case "3":
-
+<<<<<<< HEAD
                         break;
                     case "4":
                         clientHandler.gameMenu();
-
+                        
+=======
+>>>>>>> main
                 }
             }
         }catch (IOException e){
@@ -134,14 +136,16 @@ public class Multiplayer {
             }else
                 playerToJoin.sendMessage("3,Game room is full, please try to join another room!");
         }
-
+<<<<<<< HEAD
         players.add(playerToJoin);
         ArrayList<ClientHandler> playerss = new ArrayList<>();
         for(int i=1; i<players.size();i++){
             playerss.add(players.get(i));
         }
         gameLoop(playerss);
-
+=======
+        multiplayer.gameMenuForJoinedPlayers();
+>>>>>>> main
     }
 
     public void startGame() throws IOException {
@@ -173,10 +177,28 @@ public class Multiplayer {
                 }
                 gameSequencer(team1, team2);
             }
+<<<<<<< HEAD
         }
     }
 
     public void gameSequencer(@NotNull Team team1, Team team2) throws IOException {
+=======
+        } else {
+            //Is this done?
+            gameStart = true;
+//            game(team1,);
+            turnTracker(team1, team2);
+        }
+    }
+
+
+
+
+
+
+
+    public void turnTracker(Team team1, Team team2) throws IOException {
+>>>>>>> main
         int currentPlayerIndex=0;
         int opponentPlayerIndex=0;
         Team currentTeam = team1;
@@ -276,6 +298,37 @@ public class Multiplayer {
         addScoreToUser(opponentTeam);
         gameMenu();
     }
+<<<<<<< HEAD
+
+
+=======
+    public void game(Team team, ClientHandler player) throws IOException {
+        player.sendMessage("3,Be ware The server will \n only read the first character \nof the string if one is entered. \nso please enter a single character!");
+        boolean rightLetter = false;
+        if(itertaion == 0){
+            for(int i = 0; i<word.length(); i++){
+                dashes = dashes.concat("_");
+            }
+        }else {
+            player.sendMessage("3,\nScore of "+team.getTeamName()+" is: "+ team.score +"\nNumber of attempts: "+ team.numAttempts +"\nThe word: ");
+            player.sendMessage("1" + dashes);
+            clientMsg=player.readMessage();
+            for(int i = 0; i<word.length(); i++){
+                clientMsg = clientMsg.toLowerCase();
+                if(word.charAt(i) == clientMsg.toLowerCase().charAt(0)){
+                    StringBuilder stringBuilder = new StringBuilder(dashes);
+                    stringBuilder.setCharAt(i, clientMsg.charAt(0));
+                    dashes = stringBuilder.toString();
+                    team.score++;
+                    rightLetter = true;
+                }
+            }
+        }
+            if (!rightLetter){
+                team.numAttempts--;
+            }
+    }
+>>>>>>> main
     public void addScoreToUser(Team team){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("Score.txt", false));)
         {
