@@ -228,9 +228,6 @@ public class Multiplayer {
                     player.sendMessage("3,Better luck next time\nScore: "+ currentTeam.score);
                 }
                 for(int i = 1; i<players.size(); i++){
-                    //the 2v2 is fucked up, the thread only works for the last player only!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    //the 1v1 is considered done
-                    //
                     Server.createNewThread(players.get(i));
                 }
                 break;
