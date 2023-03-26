@@ -149,12 +149,6 @@ public class Multiplayer {
         gameLoop(playerss);
     }
 
-
-
-    //Function to start a game between two teams
-    // The parameter mode will be used for selecting 1v1 / 2v2
-
-    //I think this should check the mode first, then decide whether the team count is equal or not.
     public void startGame() throws IOException {
         if(mode == 1){
             if (team1.getNumPlayers() != 1 && team2.getNumPlayers() != 1) {
