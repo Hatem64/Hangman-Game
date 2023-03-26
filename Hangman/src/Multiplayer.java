@@ -250,7 +250,6 @@ public class Multiplayer {
                     if(!player.playerTurn){
                         player.sendMessage("4,"+currentPlayer.getImpUserServices().getName()+" Has guessed the right letter");
                         player.sendMessage("4," + dashes);
-
                     }
                 }
             }

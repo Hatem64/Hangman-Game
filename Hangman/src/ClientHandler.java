@@ -217,6 +217,19 @@ public class ClientHandler implements Runnable{
                                     }
                                     for (int i = 0; i< gameMasters.size(); i++){
                                         sendMessage("3,Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
+                                        if(gameMasters.get(i).multiplayer.mode == 1){
+                                            sendMessage("3,  Game type: 1v1");
+                                        }else
+                                            sendMessage("3,  Game type: 2v2");
+                                        sendMessage("3,  Team 1: ");
+                                        for (int j = 0; j<gameMasters.get(i).multiplayer.team1.getNumPlayers(); j++){
+                                            sendMessage("3,    Player: "+gameMasters.get(i).multiplayer.team1.getPlayers().get(j).getImpUserServices().getName());
+                                        }
+                                        sendMessage("3,  Team 2: ");
+                                        for (int j = 0; j<gameMasters.get(i).multiplayer.team2.getNumPlayers(); j++){
+                                            sendMessage("3,    Player: "+gameMasters.get(i).multiplayer.team2.getPlayers().get(j).getImpUserServices().getName());
+                                        }
+                                        sendMessage("3, ------------------------------");
                                     }
                                     sendMessage("1, Select one of the above rooms to join!");
                                     selected = readMessage();
