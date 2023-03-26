@@ -16,7 +16,7 @@ public class Client{
         DataInputStream input = null;
         String[] returnedMsg = null;
         boolean toChat = false;
-
+        //
         try {
             socket = new Socket(address, port);
             reader = new DataInputStream(socket.getInputStream());

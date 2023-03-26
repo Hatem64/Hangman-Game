@@ -13,7 +13,6 @@ public class Multiplayer {
     String serverMsg = "";
     String clientMsg = "";
     private String user = null;
-//    int score = 0;
     Team team1;
     Team team2;
     ClientHandler clientHandler;
@@ -232,6 +231,7 @@ public class Multiplayer {
                 for(int i = 1; i<players.size(); i++){
                     //the 2v2 is fucked up, the thread only works for the last player only!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     //the 1v1 is considered done
+                    //
                     Server.createNewThread(players.get(i));
                 }
                 break;

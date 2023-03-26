@@ -10,7 +10,6 @@ public class SinglePlayer {
     private String user = null;
     String[] userArr;
 
-    //user line in the text note, but already split into the array.
     private String userString = null;
     String clientMsg = "";
     String serverMsg = "";

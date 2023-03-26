@@ -6,6 +6,7 @@ public class Server {
     static final ArrayList<ClientHandler> clientsList = new ArrayList<>();
     private static volatile ArrayList<ClientHandler> loggedInPlayers = new ArrayList<>();
     private static volatile ArrayList<ClientHandler> masters = new ArrayList<>();
+    //
 
     public static void main(String[] args) {
         try{

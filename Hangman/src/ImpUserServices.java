@@ -27,15 +27,6 @@ public class ImpUserServices implements UserServices{
         this.clientSocket = clientSocket;
     }
 
-//    public ImpUserServices(String name, String userName, String password, List<Integer> scoresArr, Socket clientSocket) {
-//        this.name = name;
-//        this.userName = userName;
-//        this.password = password;
-//        this.scoresArr = scoresArr;
-//        this.isLoggedIn = false;
-//        this.clientSocket = clientSocket;
-//
-//    }
 
     public ArrayList<String> getScoresArr() {
         return scoresArr;

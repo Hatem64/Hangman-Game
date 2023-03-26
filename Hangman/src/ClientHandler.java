@@ -9,7 +9,6 @@ public class ClientHandler implements Runnable{
 
     Socket client;
     Scanner scanner = null;
-//    String clientMsg = "";
     String functionMsg = "";
     String functionMsg2 = "";
 
