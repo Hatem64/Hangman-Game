@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 public class ClientHandler implements Runnable{
 
-    private Socket client;
-    private Scanner scanner = null;
+    Socket client;
+    Scanner scanner = null;
 //    String clientMsg = "";
     String functionMsg = "";
     String functionMsg2 = "";
@@ -21,17 +21,43 @@ public class ClientHandler implements Runnable{
     Multiplayer multiplayer;
     String selected = "";
     String teamOption = "";
-
-    ClientHandler player;
-    String teamName;
     String modeOption;
-    Boolean isGameMaster = false;
+    boolean isGameMaster = false;
+    boolean playerTurn = false;
+
     String gameRoomName = "";
+
+    ArrayList<String> clientMsgs;
 
 //    private Team team;
     Team team1;
     Team team2;
 
+    ClientHandler clientHandler;
+    int menuToRun;
+
+    public ClientHandler(ClientHandler clientHandler, int menuToRun) {
+        this.client = clientHandler.client;
+        this.scanner = clientHandler.scanner;
+        this.functionMsg = clientHandler.functionMsg;
+        this.functionMsg2 = clientHandler.functionMsg2;
+        this.serverMsg = clientHandler.serverMsg;
+        this.dataOutputStream = clientHandler.dataOutputStream;
+        this.dataInputStream = clientHandler.dataInputStream;
+        this.impUserServices = clientHandler.impUserServices;
+        this.singlePlayer = clientHandler.singlePlayer;
+        this.multiplayer = clientHandler.multiplayer;
+        this.selected = clientHandler.selected;
+        this.teamOption = clientHandler.teamOption;
+        this.modeOption = clientHandler.modeOption;
+        this.isGameMaster = clientHandler.isGameMaster;
+        this.playerTurn = clientHandler.playerTurn;
+        this.gameRoomName = clientHandler.gameRoomName;
+        this.clientMsgs = clientHandler.clientMsgs;
+        this.team1 = clientHandler.team1;
+        this.team2 = clientHandler.team2;
+        this.menuToRun = menuToRun;
+    }
 
     public ClientHandler(Socket socket) {
         this.client = socket;
@@ -43,6 +69,7 @@ public class ClientHandler implements Runnable{
             throw new RuntimeException(e);
         }
         scanner = new Scanner(System.in);
+        this.menuToRun = 1;
 
     }
 
@@ -61,16 +88,24 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try {
-            //Menu Functions will be placed here!
-            functionMsg = registrationAndLoginMenu();
-            if (functionMsg.equals("2")){
-                functionMsg2 = gameMenu();
-            }
+            if (menuToRun == 1){
+                functionMsg = registrationAndLoginMenu();
+                if (functionMsg.equals("2")){
+                    functionMsg2 = gameMenu();
+                }
 //            if (functionMsg2.equals("2")){
 //
 //            }
+            }else {
+                functionMsg = gameMenu();
+//            if (functionMsg2.equals("2")){
+//
+//            }
+            }
             dataOutputStream.close();
             scanner.close();
+            //Menu Functions will be placed here!
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -79,7 +114,7 @@ public class ClientHandler implements Runnable{
     public String registrationAndLoginMenu(){
         try {
             while (true){
-                ArrayList<String> clientMsgs = new ArrayList<>();
+                clientMsgs = new ArrayList<>();
                 String[] returnedMsg = null;
                 serverMsg = "1,Welcome! Please login to play or create a new user!! \n 1-Login \n 2-Register \n 3-Exit Program";
                 dataOutputStream.writeUTF(serverMsg);
@@ -117,7 +152,7 @@ public class ClientHandler implements Runnable{
                         dataOutputStream.flush();
                         break;
                     case "3":
-                        return "exit";
+                        System.exit(0);
                 }
 
             }
@@ -129,7 +164,6 @@ public class ClientHandler implements Runnable{
     public String gameMenu() {
         try {
             while (true){
-                ArrayList<String> clientMsgs = new ArrayList<>();
                 String[] returnedMsg = null;
                 serverMsg = "1,Select one of following options! \n 1-Single Player \n 2-Multiplayer \n 3-Show Score History \n 4-Exit";
                 sendMessage(serverMsg);
@@ -151,10 +185,10 @@ public class ClientHandler implements Runnable{
                                     isGameMaster = true;
                                     sendMessage("1,Enter name of the game room! ;)");
                                     gameRoomName=readMessage();
-                                    if(!Server.checkUniqueness(gameRoomName)){
-                                        sendMessage("3,The name you entered already exists please enter another game");
-                                        continue;
-                                    }
+//                                    if(!Server.checkUniqueness(gameRoomName)){
+//                                        sendMessage("3,The name you entered already exists please enter another game");
+//                                        continue;
+//                                    }
                                     team1 = new Team("Team 1");
                                     team2 = new Team("Team 2");
                                     setTeam(1);
@@ -171,26 +205,30 @@ public class ClientHandler implements Runnable{
                                         //multiplayer.startGame(team1,team2,"1")
                                             break;
                                         case "2":
+                                            multiplayer.createGameRoom(team1, team2, gameRoomName, 2);
+                                            multiplayer.gameMenu();
                                             break;
                                         default:
                                             sendMessage("3,Invalid option.");
                                     }
 //                                    break;
                                 case "2":
-                                    multiplayer=new Multiplayer(this);
                                     ArrayList<ClientHandler> gameMasters = Server.getGameMasters();
                                     for (int i = 0; i< gameMasters.size(); i++){
-                                        sendMessage("3, Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
+                                        sendMessage("3,Room "+(i+1)+": "+gameMasters.get(i).getGameRoomName());
                                     }
-                                    sendMessage("1, select one of the above rooms to join!");
+                                    sendMessage("1, Select one of the above rooms to join!");
                                     selected = readMessage();
                                     if(Integer.parseInt(selected) > gameMasters.size()) {
                                         sendMessage("3,Please choose one of the rooms!!");
                                         continue;
                                     }
-                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinGame(this, multiplayer);
+                                    gameMasters.get(Integer.parseInt(selected)-1).multiplayer.joinGame(this);
                                     break;
                                 case "3":
+                                    break;
+                                case "4":
+                                    registrationAndLoginMenu();
                                     break;
                                 default:
                                     sendMessage("3,Invalid option.");

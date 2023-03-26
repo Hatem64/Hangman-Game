@@ -44,7 +44,9 @@ public class Server {
     public static ArrayList<ClientHandler> getGameMasters(){
         for(int i=0; i<loggedInPlayers.size(); i++){
             if(loggedInPlayers.get(i).isGameMaster()){
-                masters.add(loggedInPlayers.get(i));
+                if (!masters.contains(loggedInPlayers.get(i))){
+                    masters.add(loggedInPlayers.get(i));
+                }
             }
         }
         return masters;
@@ -59,9 +61,11 @@ public class Server {
         return true;
     }
 
-    public static void sendMsg(ClientHandler client2, String msg){
-        client2.sendMessage(msg);
+    public static void createNewThread(ClientHandler clientHandler2){
+        ClientHandler clientHandler = new ClientHandler(clientHandler2, 2);
+        new Thread(clientHandler).start();
     }
+
 }
 
 
