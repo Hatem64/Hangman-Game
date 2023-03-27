@@ -175,9 +175,6 @@ public class Multiplayer {
                 }
             } else {
                 gameStart = true;
-                for(ClientHandler player:players){
-                    player.sendMessage("3,Game will start shortly");
-                }
                 gameSequencer(team1, team2);
             }
         }
@@ -187,7 +184,9 @@ public class Multiplayer {
         int currentPlayerIndex=0;
         Team currentTeam = team1;
         Team opponentTeam = team2;
-
+        for(ClientHandler player:players){
+            player.sendMessage("3,Game will start shortly");
+        }
         while (team1.numAttempts!=0 || team2.numAttempts!=0){
             ClientHandler currentPlayer = currentTeam.getPlayer(currentPlayerIndex);
             currentPlayer.playerTurn = true;
@@ -237,7 +236,7 @@ public class Multiplayer {
             }
             if (!rightLetter){
                 currentTeam.numAttempts--;
-                currentPlayer.sendMessage("3,Ah sad wrong letter..");
+                currentPlayer.sendMessage("3,Ah sad. Wrong letter..");
                 if (currentTeam == team1) {
                     currentTeam = team2;
                     opponentTeam = team1;
@@ -248,8 +247,8 @@ public class Multiplayer {
             }else {
                 for(ClientHandler player:players){
                     if(!player.playerTurn){
-                        player.sendMessage("4,"+currentPlayer.getImpUserServices().getName()+" Has guessed the right letter");
-                        player.sendMessage("4," + dashes);
+                        player.sendMessage("3,"+currentPlayer.getImpUserServices().getName()+" has guessed the right letter");
+                        player.sendMessage("3," + dashes);
                     }
                 }
             }
@@ -257,11 +256,29 @@ public class Multiplayer {
             if (!dashes.contains("_")){
                 //for loop to track all players and tell them they won
                 gameStart = false;
-                for (ClientHandler player : currentTeam.getPlayers()) {
-                    player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
-                }
-                for (ClientHandler player : opponentTeam.getPlayers()) {
-                    player.sendMessage("3,Better luck next time... \nThe word was: "+word+"\nScore: "+ opponentTeam.score);
+                if(currentTeam.score > opponentTeam.score)
+                {
+                    for (ClientHandler player : currentTeam.getPlayers()) {
+                        player.sendMessage("3,Well Done!!!\nScore: "+ currentTeam.score);
+                    }
+                    for (ClientHandler player : opponentTeam.getPlayers()) {
+                        player.sendMessage("3,"+currentTeam.getTeamName()+" has won. Better luck next time... \nThe word was: "+word+"\nScore: "+ opponentTeam.score);
+                    }
+                } else if (currentTeam.score < opponentTeam.score) {
+                    for (ClientHandler player : opponentTeam.getPlayers()) {
+                        player.sendMessage("3,Well Done!!!\nScore: "+ opponentTeam.score);
+                    }
+                    for (ClientHandler player : currentTeam.getPlayers()) {
+                        player.sendMessage("3,"+opponentTeam.getTeamName()+" has won. Better luck next time... \nThe word was: "+word+"\nScore: "+ currentTeam.score);
+                    }
+                }else
+                {
+                    for (ClientHandler player : currentTeam.getPlayers()) {
+                        player.sendMessage("3,A draw?!!! I can't believe it. Couldn't one of you pull it off??!\nScore: "+ currentTeam.score);
+                    }
+                    for (ClientHandler player : opponentTeam.getPlayers()) {
+                        player.sendMessage("3,A draw?!!! I can't believe it. Couldn't one of you pull it off??!\nScore: "+ opponentTeam.score);
+                    }
                 }
                 for(int i = 1; i<players.size(); i++){
                     Server.createNewThread(players.get(i));
