@@ -154,24 +154,24 @@ public class Multiplayer {
 
     public void startGame() throws IOException {
         if(mode == 1){
-            if (team1.getNumPlayers() != 1 && team2.getNumPlayers() != 1) {
+            if (team1.getNumPlayers() != 1 || team2.getNumPlayers() != 1) {
                 for (ClientHandler player : team1.getPlayers()) {
-                    player.sendMessage("3,Error: Number of players in both teams is not equal.");
+                    player.sendMessage("3,Error: Number of players in both teams are not equal.");
                 }
                 for (ClientHandler player : team2.getPlayers()) {
-                    player.sendMessage("3,Error: Number of players in both teams is not equal.");
+                    player.sendMessage("3,Error: Number of players in both teams are not equal.");
                 }
             } else {
                 clientHandler.playerTurn = true;
                 gameSequencer(team1, team2);
             }
         }else {
-            if (team1.getNumPlayers() != 2 && team2.getNumPlayers() != 2) {
+            if (team1.getNumPlayers() != 2 || team2.getNumPlayers() != 2) {
                 for (ClientHandler player : team1.getPlayers()) {
-                    player.sendMessage("3,Error: Number of players in both teams is not equal.");
+                    player.sendMessage("3,Error: Number of players in both teams are not equal.");
                 }
                 for (ClientHandler player : team2.getPlayers()) {
-                    player.sendMessage("3,Error: Number of players in both teams is not equal.");
+                    player.sendMessage("3,Error: Number of players in both teams are not equal.");
                 }
             } else {
                 gameStart = true;
